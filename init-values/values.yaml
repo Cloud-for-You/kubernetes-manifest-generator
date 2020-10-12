@@ -1,0 +1,60 @@
+system_repo: &system-repo https://github.com/cs-poc/ocp-oshi43-system.git
+app_repo: &app-repo https://github.com/cs-poc/ocp-cloud-projects.git
+
+cluster: &cluster
+  name: oshi43
+  type: cloud
+ingress: &ingress
+  subdomain: apps
+  domain: oshi43.csas.elostech.cz #- vytahnout z clusteru
+git: &git
+  url: https://github.com/cs-poc/
+  use_sshkey: true
+helm: &helm
+  url: https://artifactory.csas.elostech.cz/artifactory/helm/
+
+workload: &workload
+  environmentTypes:
+    - dev
+    - test
+  applicationSource: https://github.com/cs-poc/{}-apps.git
+  sourceRepos:
+    - git@github.com:cs-poc/{}-*.git
+    - https://github.com/cs-poc/{}-*.git
+    - https://artifactory.csas.elostech.cz/artifactory/{}-helm
+
+#####
+
+argocd-deployment-sys:
+  argocd-config:
+    cluster:
+      system_repo: *system-repo
+      app_repo: *app-repo
+    ingress: *ingress
+    git: *git
+    helm: *helm
+    dex:
+      adminGroup: 'clusteradmins'
+
+argocd-deployment-app:
+  argocd-config:
+    #  cluster: *cluster
+    ingress: *ingress
+    git: *git
+    helm: *helm
+    dex:
+      adminGroup: 'clusteradmins'
+
+bootstrap:
+  system_repo: *system-repo
+  app_repo: *app-repo
+  app_repo_path: .
+
+csas-project-operator:
+  argocd:
+    namespace: csas-argocd-app
+  <<: *workload
+
+csas-application-operator:
+  argocd:
+    namespace: csas-argocd-app
