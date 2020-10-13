@@ -6,7 +6,7 @@ cluster: &cluster
   type: cloud
 ingress: &ingress
   subdomain: apps
-  domain: oshi43.csas.elostech.cz #- vytahnout z clusteru
+  domain: oshi43.csas.elostech.cz
 git: &git
   url: https://github.com/cs-poc/
   use_sshkey: true
