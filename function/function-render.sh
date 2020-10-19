@@ -2,14 +2,18 @@
 
 HELM_ARTIFACTORY='ocp-artifactory'
 
-update_helm_repo() {
+init_helm_repo() {
   ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.helm.url')
   ARTIF_USER=$(yq read -X ${ROOTDIR}/values/secrets.yaml 'argocd-deployment-sys.helm.user')
   ARTIF_PASSWORD=$(yq read -X ${ROOTDIR}/values/secrets.yaml 'argocd-deployment-sys.helm.password')
 
   helm repo add --no-update "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
-  helm repo update
   #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
+}
+
+update_helm_repo() {
+  init_helm_repo || true
+  helm repo update
 }
 
 get_component_version() {
