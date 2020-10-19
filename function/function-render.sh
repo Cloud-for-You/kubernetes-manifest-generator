@@ -36,7 +36,7 @@ render_helm() {
   RENDER_NAME=$1
   RENDER_VERSION=$2
 
-  RENDER_LOCAL=${RENDER_LOCAL:-0}
+  RENDER_LOCAL=${RENDER_LOCAL:-""}
 
   rm -rf "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
   mkdir -p "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
