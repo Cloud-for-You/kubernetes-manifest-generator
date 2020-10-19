@@ -9,6 +9,7 @@ update_helm_repo() {
 
   helm repo add --no-update "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
   helm repo update
+  #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
 }
 
 get_component_version() {
