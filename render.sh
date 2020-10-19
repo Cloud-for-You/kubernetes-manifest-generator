@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e -u
 . $(dirname $0)/function/function-render.sh
 
 update_helm_repo
