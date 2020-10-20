@@ -1,13 +1,20 @@
 . $(dirname $0)/function/function-common.sh
 
 HELM_ARTIFACTORY='ocp-artifactory'
+HELM_OPTIONS="${HELM_OPTIONS:---no-update}"
 
 init_helm_repo() {
   ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.helm.url')
   ARTIF_USER=$(yq read -X ${ROOTDIR}/values/secrets.yaml 'argocd-deployment-sys.helm.user')
   ARTIF_PASSWORD=$(yq read -X ${ROOTDIR}/values/secrets.yaml 'argocd-deployment-sys.helm.password')
 
-  helm repo add --no-update "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
+  CAOPTS=''
+  if [ -f values/cacert.pem ]; then
+    cp values/cacert.pem ~/.config/helm/${HELM_ARTIFACTORY}.crt
+    CAOPTS="--ca-file $(readlink -f ~/.config/helm/${HELM_ARTIFACTORY}.crt)"
+  fi
+
+  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}" ${HELM_OPTIONS}
   #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
 }
 
@@ -26,6 +33,7 @@ prepare_local_render() {
   echo mkdir -p "${ROOTDIR}/.local"
   echo ln -s XXXXX/argocd-deployment-sys "${ROOTDIR}/.local/argocd-deployment-sys"
   echo ln -s XXXXX/argocd-deployment-app "${ROOTDIR}/.local/argocd-deployment-app"
+  echo ln -s XXXXX/sealed-secrets "${ROOTDIR}/.local/sealed-secrets"
   echo ln -s XXXXX/bootstrap "${ROOTDIR}/.local/bootstrap"
   echo ln -s XXXXX/deploy/ "${ROOTDIR}/.local/csas-project-operator"
   echo ln -s XXXXX/deploy/ "${ROOTDIR}/.local/csas-application-operator"
@@ -87,6 +95,11 @@ render_argocd_sys() {
 render_argocd_app() {
   VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
   render_helm argocd-deployment-app "${VERSION}"
+}
+
+render_sealed_secrets() {
+  VERSION=$(get_component_version SEALED_SECRETS)
+  render_helm sealed-secrets "${VERSION}"
 }
 
 render_bootstrap() {
