@@ -4,7 +4,25 @@ set -e -u
 
 CLUSTER_NAME=$1
 
+################################################################################################################################################################
+##### Inicializační skript ArgoCD deploymentu clusteru - STAGE 1
 ########################################
+##### Skript má tyto vstupy:
+#####   Povinné parametry:
+#####   - jméno clusteru - použije se v adrese GIT repozitáře: ssh://git@sdf.csin.cz:2222/OCP4/ocp-${CLUSTER_NAME}-system.git
+#####                      a ve jménu vytvořeného lokálního adresáře
+########################################
+##### Skript má tyto výstupy:
+#####   Adresář: ocp-${CLUSTER_NAME}-system (jako podadresář v adresáři, ze kterého je skript spuštěn) - obsahuje lokální klon GIT repozitáře pro daný cluster
+#####   Soubor:  ocp-${CLUSTER_NAME}-secrets.yaml (v adresáři, ze kterého je skript spuštěn) - obsahuje šablonu pro secrets daného clusteru
+########################################
+##### Skript provádí následující operace:
+#####   1. naklonuje GIT repozitář daného clusteru z Bitbucket serveru
+#####   2. naklonuje GIT repozitář s inicializačními skripty jako GIT submodul "script"
+#####   3. připraví iniciální obsah 
+##### Po každém kroku následuje GIT commit
+##### Skript je znovuspustitelný
+################################################################################################################################################################
 
 CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
 SECRETS_FILE="ocp-${CLUSTER_NAME}-secrets.yaml"
