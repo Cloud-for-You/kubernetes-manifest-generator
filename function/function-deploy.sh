@@ -40,7 +40,7 @@ setup_argo_admin_password() {
   INSTANCE=$1
   METHOD=$2
 
-  PASSWD=$(yq read -X ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.admin_password")
+  PASSWD=$(yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.admin_password")
 
   if [ -z "${METHOD}" ]; then
     which python3 &>/dev/null && python3 -c "import crypt; crypt.METHOD_BLOWFISH" &>/dev/null && METHOD=python3
@@ -84,9 +84,9 @@ setup_argo_dex_secret() {
 setup_argo_repo_git_secret() {
   INSTANCE=$1
 
-  GIT_USER=$(yq read -X ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.git.user")
-  GIT_PASS=$(yq read -X ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.git.password")
-  GIT_SSHK=$(yq read -X ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.git.sshkey")
+  GIT_USER=$(yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.user")
+  GIT_PASS=$(yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.password")
+  GIT_SSHK=$(yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.sshkey")
 
   if [ -n "${GIT_SSHK}" ]; then
     oc set data -n "csas-argocd-${INSTANCE}" secret/repo-cs-argo --from-literal=git-ssh="${GIT_SSHK}"
@@ -107,7 +107,7 @@ setup_argo_repo_git_secret() {
   fi
 
   exit 1
-  yq read -X ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}"
+  yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}"
   if [ -z "${DEXSECRET}" ]; then
     echo "Can't setup empty dex secret" && return 1
   fi
@@ -118,12 +118,12 @@ setup_argo_repo_git_secret() {
 deploy_secrets() {
   INSTANCE=$1
 
-  GIT_USER=$(yq read ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.git.user")
-  GIT_PASS=$(yq read ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.git.password")
-  GIT_SSHK=$(yq read ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.git.sshkey")
+  GIT_USER=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.user")
+  GIT_PASS=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.password")
+  GIT_SSHK=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.sshkey")
 
-  HELM_USER=$(yq read ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.helm.user")
-  HELM_PASS=$(yq read ${ROOTDIR}/values/secrets.yaml "argocd-deployment-${INSTANCE}.helm.password")
+  HELM_USER=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.helm.user")
+  HELM_PASS=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.helm.password")
 
   [ -n "${GIT_USER}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-user\": \"${GIT_USER}\" } }"
   [ -n "${GIT_PASS}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-pass\": \"${GIT_PASS}\"} }"

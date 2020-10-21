@@ -3,6 +3,8 @@
 set -e -u
 . $(dirname $0)/function/function-render.sh
 
+export SECRETS_FILE
+
 update_helm_repo
 render_argocd_sys
 render_argocd_app

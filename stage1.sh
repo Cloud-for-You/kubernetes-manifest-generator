@@ -57,4 +57,4 @@ fi
 
 popd
 
-[ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${VALUES_FILE}"
+[ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${SECRETS_FILE}"

@@ -5,8 +5,8 @@ HELM_OPTIONS="${HELM_OPTIONS:---no-update}"
 
 init_helm_repo() {
   ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.helm.url')
-  ARTIF_USER=$(yq read -X ${ROOTDIR}/values/secrets.yaml 'argocd-deployment-sys.helm.user')
-  ARTIF_PASSWORD=$(yq read -X ${ROOTDIR}/values/secrets.yaml 'argocd-deployment-sys.helm.password')
+  ARTIF_USER=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.helm.user')
+  ARTIF_PASSWORD=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.helm.password')
 
   CAOPTS=''
   if [ -f values/cacert.pem ]; then
