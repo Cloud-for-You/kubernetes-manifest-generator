@@ -38,7 +38,7 @@ deploy_bootstrap() {
 
 setup_argo_admin_password() {
   INSTANCE=$1
-  METHOD=$2
+  METHOD=${2:-}
 
   PASSWD=$(yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.admin_password")
 
@@ -54,7 +54,7 @@ setup_argo_admin_password() {
     # mkpasswd) PWDSTR=`mkpasswd -m bcrypt-a "${PASSWD}"`;;
     # htpasswd) PWDSTR=`htpasswd -bnBC 10 "" "${PASSWD}" | tr -d ':\n'`;;
     # python3)  PWDSTR=`PASSWD="${PASSWD}" python3 -c "import crypt; import os; print(crypt.crypt(os.environ['PASSWD'], crypt.METHOD_BLOWFISH))"`;;
-    *)        PWDSTR=''
+    *)        PWDSTR="${PASSWD}"
   esac
 
   MTIMESTR=$(TZ=GMT date +'%Y-%m-%dT%H:%M:%SZ')
@@ -105,33 +105,25 @@ setup_argo_repo_git_secret() {
   else
     oc set data -n "csas-argocd-${INSTANCE}" secret/repo-cs-argo git-pass-
   fi
-
-  exit 1
-  yq read -X ${SECRETS_FILE} "argocd-deployment-${INSTANCE}"
-  if [ -z "${DEXSECRET}" ]; then
-    echo "Can't setup empty dex secret" && return 1
-  fi
-
-  oc patch secret/argocd-secret -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"dex.openshift.secret\": \"${DEXSECRET}\" } }"
 }
 
-deploy_secrets() {
-  INSTANCE=$1
+# deploy_secrets() {
+#   INSTANCE=$1
 
-  GIT_USER=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.user")
-  GIT_PASS=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.password")
-  GIT_SSHK=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.sshkey")
+#   GIT_USER=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.user")
+#   GIT_PASS=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.password")
+#   GIT_SSHK=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.git.sshkey")
 
-  HELM_USER=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.helm.user")
-  HELM_PASS=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.helm.password")
+#   HELM_USER=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.helm.user")
+#   HELM_PASS=$(yq read ${SECRETS_FILE} "argocd-deployment-${INSTANCE}.helm.password")
 
-  [ -n "${GIT_USER}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-user\": \"${GIT_USER}\" } }"
-  [ -n "${GIT_PASS}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-pass\": \"${GIT_PASS}\"} }"
-  [ -n "${GIT_SSHK}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-ssh\": \"${GIT_SSHK}\" } }"
+#   [ -n "${GIT_USER}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-user\": \"${GIT_USER}\" } }"
+#   [ -n "${GIT_PASS}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-pass\": \"${GIT_PASS}\"} }"
+#   [ -n "${GIT_SSHK}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"git-ssh\": \"${GIT_SSHK}\" } }"
 
-  [ -n "${HELM_USER}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"helm-user\": \"${HELM_USER}\" } }"
-  [ -n "${HELM_PASS}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"helm-pass\": \"${HELM_PASS}\" } }"
-}
+#   [ -n "${HELM_USER}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"helm-user\": \"${HELM_USER}\" } }"
+#   [ -n "${HELM_PASS}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"helm-pass\": \"${HELM_PASS}\" } }"
+# }
 
 label_cluster_resources() {
   for file in $(find ${ROOTDIR}/${FINALDIR}/cluster-config/ -type f); do
