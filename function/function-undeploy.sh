@@ -6,12 +6,14 @@
 # }
 
 undeploy_bootstrap() {
+  echo oc delete -n csas-argocd-sys Application.argoproj.io/bootstrap
+}
+
+undeploy_content() {
   for app in $(oc get -n csas-argocd-sys Application.argoproj.io -o custom-columns='NAME:.metadata.name' --no-headers | grep -v -e argocd-sys -e bootstrap); do
     echo oc patch -n csas-argocd-sys Application.argoproj.io/${app} -p '{"metadata": {"finalizers": ["resources-finalizer.argocd.argoproj.io"]}}' --type merge
     echo oc delete -n csas-argocd-sys Application.argoproj.io/${app}
   done
-
-  echo oc delete -n csas-argocd-sys Application.argoproj.io/bootstrap
 }
 
 undeploy_argo() {
