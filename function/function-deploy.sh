@@ -125,9 +125,9 @@ setup_argo_repo_git_secret() {
 #   [ -n "${HELM_PASS}" ] && oc patch secret/repo-cs-argo -n "csas-argocd-${INSTANCE}" -p="{ \"stringData\": { \"helm-pass\": \"${HELM_PASS}\" } }"
 # }
 
-label_cluster_resources() {
-  for file in $(find ${ROOTDIR}/${FINALDIR}/cluster-config/ -type f); do
-    echo "Label: ${file}"
-    oc label -f "${file}" argocd.argoproj.io/instance-sys=cluster-config
-  done
-}
+# label_cluster_resources() {
+#   for file in $(find ${ROOTDIR}/${FINALDIR}/cluster-config/ -type f); do
+#     echo "Label: ${file}"
+#     oc label -f "${file}" argocd.argoproj.io/instance-sys=cluster-config
+#   done
+# }

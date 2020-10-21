@@ -17,11 +17,11 @@ export SECRETS_FILE=$1
 #####                           jedná se o sobor vytvořený ve STAGE 1 ve stejném adresáři, jako klon GIT repozitáře
 ########################################
 ##### Skript provádí následující operace:
-#####   1. nadeployuje ArgoCD SYS
-#####   2. nadeployuje credentias pro ArgoCD SYS
+#####   1. nadeployuje ArgoCD SYS a počká na naběhnutí
+#####   2. nadeployuje credentials pro ArgoCD SYS
 #####      - heslo účtu "admin"
 #####      - integrace OIDC s OCP
-#####      - credentials GIT a HELM pro ArgoCD SYS
+#####      - credentials GIT pro ArgoCD SYS
 ##### Skript není znovuspustitelný
 ################################################################################################################################################################
 

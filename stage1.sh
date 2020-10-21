@@ -30,7 +30,7 @@ CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="../init-scripts.git"
 
 if [ ! -d "${CLUSTER_DIR}" ]; then
-  git clone "${CLUSTER_REPO}" "${CLUSTER_DIR}"
+  git clone "${CLUSTER_REPO}" "${CLUSTER_DIR}" --recurse-submodules
 fi
 
 pushd "${CLUSTER_DIR}"

@@ -18,7 +18,8 @@ export SECRETS_FILE=$1
 ########################################
 ##### Skript provádí následující operace:
 #####   1. nadeployuje obsah pro ArgoCD SYS, což zajistí rozběhnutí všech komponent
-#####   2. nadeployuje credentias pro ArgoCD APP
+#####   2. počká na ArgoCD APP, resp. na jeho serviceAccount "argocd-dex-server"
+#####   3. nadeployuje credentials pro ArgoCD APP
 #####      - heslo účtu "admin"
 #####      - integrace OIDC s OCP
 #####      - credentials GIT a HELM pro ArgoCD SYS
@@ -28,4 +29,9 @@ export SECRETS_FILE=$1
 CLUSTER_DIR="$(pwd)"
 
 script/deploy-bootstrap.sh
+while true; do
+  echo "Waiting for ArgoCD APP"
+  oc get sa/argocd-dex-server -n csas-argocd-app -o name 2>/dev/null && break
+  sleep 5
+done
 script/setup-argo-app.sh
