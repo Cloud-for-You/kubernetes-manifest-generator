@@ -1,7 +1,6 @@
 . $(dirname $0)/function/function-common.sh
 
 HELM_ARTIFACTORY='ocp-artifactory'
-HELM_OPTIONS="${HELM_OPTIONS:---no-update}"
 
 init_helm_repo() {
   ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.helm.url')
@@ -9,12 +8,12 @@ init_helm_repo() {
   ARTIF_PASSWORD=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.helm.password')
 
   CAOPTS=''
-  if [ -f values/cacert.pem ]; then
-    cp values/cacert.pem ~/.config/helm/${HELM_ARTIFACTORY}.crt
-    CAOPTS="--ca-file $(readlink -f ~/.config/helm/${HELM_ARTIFACTORY}.crt)"
+  CAFILE="~/.config/helm/${HELM_ARTIFACTORY}.crt"
+  if [ -f "${CAFILE}" ]; then
+    CAOPTS="--ca-file $(readlink -f ${CAFILE})"
   fi
 
-  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}" ${HELM_OPTIONS}
+  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
   #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
 }
 

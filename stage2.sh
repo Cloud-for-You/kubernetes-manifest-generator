@@ -39,6 +39,7 @@ if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Cluster configuration"
 fi
 
+script/init.sh
 script/render.sh
 git reset HEAD
 git add resources
