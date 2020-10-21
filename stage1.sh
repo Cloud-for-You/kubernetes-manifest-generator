@@ -7,7 +7,7 @@ CLUSTER_NAME=$1
 ########################################
 
 CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
-VALUES_FILE="ocp-${CLUSTER_NAME}-values.yaml"
+SECRETS_FILE="ocp-${CLUSTER_NAME}-secrets.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="../init-scripts.git"
 
@@ -39,4 +39,4 @@ fi
 
 popd
 
-[ -f "${VALUES_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${VALUES_FILE}"
+[ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${VALUES_FILE}"
