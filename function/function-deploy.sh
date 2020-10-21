@@ -48,12 +48,13 @@ setup_argo_admin_password() {
     which mkpasswd &>/dev/null && METHOD=mkpasswd
   fi
 
+  #TODO Upravit tak, ze pokud nenalezne ani jeden z nastroju, tak fail
   PWDSTR=''
   case "${METHOD}" in
-    mkpasswd) PWDSTR=$(mkpasswd -m bcrypt-a "${PASSWD}");;
-    htpasswd) PWDSTR=$(htpasswd -bnBC 10 "" "${PASSWD}" | tr -d ':\n');;
-    python3)  PWDSTR=$(PASSWD="${PASSWD}" python3 -c "import crypt; import os; print(crypt.crypt(os.environ['PASSWD'], crypt.METHOD_BLOWFISH))");;
-    *)        PWDSTR="${PASSWD}"
+    # mkpasswd) PWDSTR=`mkpasswd -m bcrypt-a "${PASSWD}"`;;
+    # htpasswd) PWDSTR=`htpasswd -bnBC 10 "" "${PASSWD}" | tr -d ':\n'`;;
+    # python3)  PWDSTR=`PASSWD="${PASSWD}" python3 -c "import crypt; import os; print(crypt.crypt(os.environ['PASSWD'], crypt.METHOD_BLOWFISH))"`;;
+    *)        PWDSTR=''
   esac
 
   MTIMESTR=$(TZ=GMT date +'%Y-%m-%dT%H:%M:%SZ')
