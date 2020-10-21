@@ -8,9 +8,9 @@ init_helm_repo() {
   ARTIF_PASSWORD=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.helm.password')
 
   CAOPTS=''
-  CAFILE="~/.config/helm/${HELM_ARTIFACTORY}.crt"
+  CAFILE="$(readlink -f ~/.config/helm/${HELM_ARTIFACTORY}.crt)"
   if [ -f "${CAFILE}" ]; then
-    CAOPTS="--ca-file $(readlink -f ${CAFILE})"
+    CAOPTS="--ca-file ${CAFILE}"
   fi
 
   helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
