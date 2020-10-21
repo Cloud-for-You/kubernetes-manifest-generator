@@ -7,6 +7,7 @@ CLUSTER_NAME=$1
 ########################################
 
 CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
+VALUES_FILE="ocp-${CLUSTER_NAME}-values.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="../init-scripts.git"
 
@@ -14,7 +15,7 @@ if [ ! -d "${CLUSTER_DIR}" ]; then
   git clone "${CLUSTER_REPO}" "${CLUSTER_DIR}"
 fi
 
-cd "${CLUSTER_DIR}"
+pushd "${CLUSTER_DIR}"
 
 if ! git log &>/dev/null; then
   git commit --allow-empty -m "Initial empty commit"
@@ -35,3 +36,7 @@ git add values custom .gitignore
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
+
+popd
+
+[ -f "${VALUES_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${VALUES_FILE}"
