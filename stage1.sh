@@ -57,8 +57,8 @@ if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
 
+git push
+
 popd
 
 [ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
-
-git push
