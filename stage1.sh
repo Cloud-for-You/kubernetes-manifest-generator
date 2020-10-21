@@ -19,7 +19,9 @@ CLUSTER_NAME=$1
 ##### Skript provádí následující operace:
 #####   1. naklonuje GIT repozitář daného clusteru z Bitbucket serveru
 #####   2. naklonuje GIT repozitář s inicializačními skripty jako GIT submodul "script"
-#####   3. připraví iniciální obsah 
+#####   3. připraví iniciální obsah v repozitáři
+#####   4. připraví soubor secrets
+#####   5. provede "git push"
 ##### Po každém kroku následuje GIT commit
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
@@ -58,3 +60,5 @@ fi
 popd
 
 [ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
+
+git push
