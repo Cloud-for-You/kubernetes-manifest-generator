@@ -20,7 +20,6 @@ export SECRETS_FILE=$1
 #####   1. updatuje GIT submodul "script" s inicializačními skripty
 #####   2. zinicializuje Help repo proti Artifactory
 #####   3. vyrenderuje finální manifesty pro ArgoCD na základě vyplněných values, versions a secrets
-#####   4. provede "git push"
 ##### Po každém kroku následuje GIT commit
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
@@ -47,5 +46,3 @@ git add resources
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Rendered deployment"
 fi
-
-git push

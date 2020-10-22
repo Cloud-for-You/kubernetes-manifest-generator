@@ -25,6 +25,11 @@
 ### Uložit secrets
 * Uložte na bezpečné místo soubor `ocp-<CLUSTER_NAME>-system.yaml`
 
+### Uložit deployment
+* Zkontrolujte dployment (TBD)
+* Nahrajte deployment do GITu pomocí:
+  `git push`
+
 # STAGE 3
 ### Nasadit ArgoCD SYS do clusteru
 * Spusťte třetí část deploy procesu z adresáře `ocp-<CLUSTER_NAME>-system` a jako parametr dejte jméno souboru se secrets:

@@ -21,7 +21,6 @@ CLUSTER_NAME=$1
 #####   2. naklonuje GIT repozitář s inicializačními skripty jako GIT submodul "script"
 #####   3. připraví iniciální obsah v repozitáři
 #####   4. připraví soubor secrets
-#####   5. provede "git push"
 ##### Po každém kroku následuje GIT commit
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
@@ -56,8 +55,6 @@ git add values custom .gitignore
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
-
-git push
 
 popd
 
