@@ -6,19 +6,27 @@
 # }
 
 undeploy_bootstrap() {
-  echo oc delete -n csas-argocd-sys Application.argoproj.io/bootstrap
+cat <<EOF
+oc delete -n csas-argocd-sys Application.argoproj.io/bootstrap
+EOF
 }
 
 undeploy_content() {
   for app in $(oc get -n csas-argocd-sys Application.argoproj.io -o custom-columns='NAME:.metadata.name' --no-headers | grep -v -e argocd-sys -e bootstrap); do
-    echo oc patch -n csas-argocd-sys Application.argoproj.io ${app} -p '{"metadata": {"finalizers": ["resources-finalizer.argocd.argoproj.io"]}}' --type merge
-    echo oc delete -n csas-argocd-sys Application.argoproj.io ${app}
+cat <<EOF
+oc patch -n csas-argocd-sys Application.argoproj.io ${app} -p '{"metadata": {"finalizers": ["resources-finalizer.argocd.argoproj.io"]}}' --type merge
+oc delete -n csas-argocd-sys Application.argoproj.io ${app}
+EOF
   done
-  echo oc delete -n csas-argocd-sys Application.argoproj.io argocd-sys
+cat <<EOF
+oc delete -n csas-argocd-sys Application.argoproj.io argocd-sys
+EOF
 }
 
 undeploy_argo() {
-  echo oc delete -f "${ROOTDIR}/resources/argocd-deployment-sys"
+cat <<EOF
+oc delete -f "${ROOTDIR}/resources/argocd-deployment-sys"
+EOF
 }
 
 # unlabel_cluster_resources() {

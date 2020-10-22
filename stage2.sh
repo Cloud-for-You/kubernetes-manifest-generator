@@ -18,7 +18,7 @@ export SECRETS_FILE=$1
 ########################################
 ##### Skript provádí následující operace:
 #####   1. updatuje GIT submodul "script" s inicializačními skripty
-#####   2. zinicializuje Help repo proti Artifactory
+#####   2. zinicializuje Helm repo proti Artifactory
 #####   3. vyrenderuje finální manifesty pro ArgoCD na základě vyplněných values, versions a secrets
 ##### Po každém kroku následuje GIT commit
 ##### Skript je znovuspustitelný
