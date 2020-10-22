@@ -73,10 +73,14 @@ bootstrap:
   app_repo_path: .
 
 csas-project-operator:
+  nameOverride: ''
+  serviceAccountNameOverride: ''
   argocd:
     namespace: csas-argocd-app
   <<: *workload
 
 csas-application-operator:
+  nameOverride: ''
+  serviceAccountNameOverride: ''
   argocd:
     namespace: csas-argocd-app

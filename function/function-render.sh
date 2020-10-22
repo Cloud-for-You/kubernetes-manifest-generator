@@ -61,7 +61,7 @@ render_helm() {
   echo "Rendering ${RENDER_NAME} - ${RENDER_VERSION}"
 
   yq read -X "${ROOTDIR}/values/values.yaml" "${RENDER_NAME}" > "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml"
-  helm lint "${HELM_CHART}" -f "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml" --strict --skip-headers --with-subcharts | grep -v "0 chart(s) failed" | grep -v "icon is recommended" | grep .
+  exec_cmd helm lint "${HELM_CHART}" -f "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml" --strict --skip-headers --with-subcharts
   helm template "${HELM_CHART}" -f "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml" --include-crds > "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/${RENDER_NAME}.yaml"
 
   cat <<EOF > "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/kustomization.yaml"
