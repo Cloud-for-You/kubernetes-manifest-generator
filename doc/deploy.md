@@ -26,9 +26,22 @@
 * Uložte na bezpečné místo soubor `ocp-<CLUSTER_NAME>-system.yaml`
 
 ### Uložit deployment
-* Zkontrolujte dployment (TBD)
+* Nyní je deployment uložen ve větvi `install` a je potřeba provést jeho revizi a zamergování do větve `master`
+  * Automatizační skripty nezapisují (s výjimkou iniciálních commitů během `stage1`) z bezpečnostních důvodů přímo do větve master, ale do větve `install`
+* Revizi provedte pomocí `git diff`:
+  ```
+  git diff master..install
+  ```
+* Zamergování proveďte pomocí `git merge`:
+  ```
+  git checkout master
+  git merge --no-ff -m 'Merge rendered manifest' install
+  git branch -d install
+  ```
 * Nahrajte deployment do GITu pomocí:
-  `git push`
+  ```
+  git push
+  ```
 
 # STAGE 3
 ### Nasadit ArgoCD SYS do clusteru

@@ -29,6 +29,7 @@ CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
 SECRETS_FILE="ocp-${CLUSTER_NAME}-secrets.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="../init-scripts.git"
+ARGO_BRANCH="master"
 
 if [ ! -d "${CLUSTER_DIR}" ]; then
   git clone "${CLUSTER_REPO}" "${CLUSTER_DIR}" --recurse-submodules
@@ -39,6 +40,8 @@ pushd "${CLUSTER_DIR}"
 if ! git log &>/dev/null; then
   git commit --allow-empty -m "Initial empty commit"
 fi
+
+git checkout "${ARGO_BRANCH}"
 
 if ! git submodule status script &>/dev/null; then
   git reset HEAD

@@ -25,6 +25,10 @@ export SECRETS_FILE=$1
 ################################################################################################################################################################
 
 CLUSTER_DIR="$(pwd)"
+ARGO_BRANCH="master"
+INSTALL_BRANCH="install"
+
+git checkout "${ARGO_BRANCH}"
 
 git reset HEAD
 git submodule update --remote script/
@@ -32,6 +36,9 @@ git add script
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Updated scripts submodule"
 fi
+
+git branch -D "${INSTALL_BRANCH}"
+git checkout -b "${INSTALL_BRANCH}"
 
 git reset HEAD
 git add values custom
@@ -46,3 +53,5 @@ git add resources
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Rendered deployment"
 fi
+
+git checkout "${ARGO_BRANCH}"
