@@ -27,7 +27,11 @@ git: &git
 ##### Konfigurace HELM pro ArgoCD - nastavení credentials a nastavení povolených repozitářů - pro ArgoCD APP; nastavení Helm repository při renderování manifestů
 helm: &helm
   ##### Prefix HELM chartů na Artifactory (credentials uvedené v secrets)
-  url: https://artifactory.csas.elostech.cz/artifactory/helm/
+  url: https://artifactory.csin.cz/artifactory/ocp-helm/
+##### Konfigurace Kustomize pro ArgoCD - nastavení Kustomize repository při renderování manifestů
+kustomize: &kustomize
+  ##### Repository s kustomize ZIP balíčky v Artifactory (credentials uvedené v secrets)
+  url: https://artifactory.csin.cz/artifactory/ocp-generic/
 
 ##### Konfigurace pro Project operator
 workload: &workload
@@ -54,7 +58,9 @@ argocd-deployment-sys:
       app_repo: *app-repo
     ingress: *ingress
     git: *git
+#TODO vyhodit ze SYS Helm i Kutomize a presunout jinam
     helm: *helm
+    kustomize: *kustomize
     dex:
       adminGroup: 'clusteradmins'
 
@@ -78,9 +84,3 @@ csas-project-operator:
   argocd:
     namespace: csas-argocd-app
   <<: *workload
-
-csas-application-operator:
-  nameOverride: ''
-  serviceAccountNameOverride: ''
-  argocd:
-    namespace: csas-argocd-app

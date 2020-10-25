@@ -77,3 +77,5 @@ Pro správu deploymentu jsou potřeba tyto nástroje:
   * pro správu deploymentu
 * `yq` - [mikefarah yq ve verzi 3](https://github.com/mikefarah/yq)
   * pro parsování a strojovou úpravu YAML manifestů
+* `unzip`
+  * pro rozbalení kustomize balíčku

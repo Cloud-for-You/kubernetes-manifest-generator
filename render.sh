@@ -5,7 +5,7 @@ set -e -u
 
 export SECRETS_FILE
 
-update_helm_repo
+init
 render_argocd_sys
 render_argocd_app
 render_sealed_secrets

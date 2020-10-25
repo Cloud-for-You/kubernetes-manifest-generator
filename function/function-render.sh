@@ -1,6 +1,8 @@
 . $(dirname $0)/function/function-common.sh
 
 HELM_ARTIFACTORY='ocp-artifactory'
+NETRC_FILE=~/.netrc-${HELM_ARTIFACTORY}
+KUSTOMIZE_SUBDIR=csas
 
 init_helm_repo() {
   ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.helm.url')
@@ -17,9 +19,30 @@ init_helm_repo() {
   #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
 }
 
+init_kustomize_netrc() {
+  ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.kustomize.url')
+  ARTIF_USER=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.kustomize.user')
+  ARTIF_PASSWORD=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.kustomize.password')
+
+  ARTIF_HOST=${ARTIF_URL}
+  ARTIF_HOST=${ARTIF_URL#*://}
+  ARTIF_HOST=${ARTIF_HOST%%/*}
+
+  cat > ${NETRC_FILE} <<EOF
+machine ${ARTIF_HOST}
+  login ${ARTIF_USER}
+  password ${ARTIF_PASSWORD}
+EOF
+}
+
 update_helm_repo() {
   init_helm_repo || true
   helm repo update
+}
+
+init() {
+  update_helm_repo
+  init_kustomize_netrc
 }
 
 get_component_version() {
@@ -76,6 +99,60 @@ EOF
   echo "Rendered ${RENDER_NAME} - ${RENDER_VERSION}"
 }
 
+render_kustomize() {
+  RENDER_NAME=$1
+  RENDER_VERSION=$2
+
+  ARTIF_URL=$(yq read -X ${ROOTDIR}/values/values.yaml 'argocd-deployment-sys.argocd-config.kustomize.url')
+  ARTIF_USER=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.kustomize.user')
+  ARTIF_PASSWORD=$(yq read -X ${SECRETS_FILE} 'argocd-deployment-sys.kustomize.password')
+
+  RENDER_LOCAL=${RENDER_LOCAL:-""}
+
+  rm -rf "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
+  mkdir -p "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
+  rm -rf "${ROOTDIR}/${FINALDIR}/${RENDER_NAME}"
+  mkdir -p "${ROOTDIR}/${FINALDIR}/${RENDER_NAME}"
+
+  CAOPTS=''
+  CAFILE="$(readlink -f ~/.config/helm/${HELM_ARTIFACTORY}.crt)"
+  if [ -f "${CAFILE}" ]; then
+    CAOPTS="--cacert ${CAFILE}"
+  fi
+
+  if [ -z "${RENDER_LOCAL}" ]; then
+    curl -f -sS --netrc-file "${NETRC_FILE}" ${CAOPTS} -o ${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}-${RENDER_VERSION}.zip ${ARTIF_URL}/${KUSTOMIZE_SUBDIR}/${RENDER_NAME}/${RENDER_NAME}-${RENDER_VERSION}.zip
+  else
+    RENDER_VERSION=v0.0.0
+    #TODO TBD
+  fi
+
+  echo "Rendering ${RENDER_NAME} - ${RENDER_VERSION}"
+
+  rm -rf "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/${RENDER_NAME}-${RENDER_VERSION}.zip/"
+  unzip -q "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}-${RENDER_VERSION}.zip" -d "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/${RENDER_NAME}-${RENDER_VERSION}.zip/"
+
+  # - ${ARTIF_URL}/${KUSTOMIZE_SUBDIR}/${RENDER_NAME}/${RENDER_NAME}-${RENDER_VERSION}.zip
+  cat <<EOF > "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/kustomization.yaml"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ${RENDER_NAME}-${RENDER_VERSION}.zip/
+
+namespace: csas-application-operator
+
+configMapGenerator:
+  - name: controller-manager
+    behavior: merge
+    literals:
+      - ARGOCD_NAMESPACE=csas-argocd-app
+EOF
+  kustomize build "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}" -o "${ROOTDIR}/${FINALDIR}/${RENDER_NAME}"
+
+  echo "Rendered ${RENDER_NAME} - ${RENDER_VERSION}"
+}
+
 render_custom() {
   RENDER_NAME=$1
 
@@ -115,7 +192,7 @@ render_project_operator() {
   VERSION=$(get_component_version PROJECT_OPERATOR)
   [ -n "${VERSION}" ] || return
   render_helm csas-project-operator "${VERSION}"
-  cat > "${ROOTDIR}/${FINALDIR}/csas-project-operator/namespace.yaml" <<EOF
+  cat > "${ROOTDIR}/${FINALDIR}/csas-project-operator/~g_v1_namespace_csas-project-operator.yaml" <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -127,8 +204,8 @@ render_application_operator() {
   #TODO change to kustomize in new version of operator
   VERSION=$(get_component_version APPLICATION_OPERATOR)
   [ -n "${VERSION}" ] || return
-  render_helm csas-application-operator "${VERSION}"
-  cat > "${ROOTDIR}/${FINALDIR}/csas-application-operator/namespace.yaml" <<EOF
+  render_kustomize csas-application-operator "${VERSION}"
+  cat > "${ROOTDIR}/${FINALDIR}/csas-application-operator/~g_v1_namespace_csas-application-operator.yaml" <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
