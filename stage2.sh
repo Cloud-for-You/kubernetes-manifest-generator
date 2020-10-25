@@ -16,11 +16,11 @@ export SECRETS_FILE=$1
 #####   - soubor se secrets - ocp-${CLUSTER_NAME}-secrets.yaml
 #####                           jedná se o sobor vytvořený ve STAGE 1 ve stejném adresáři, jako klon GIT repozitáře
 ########################################
-##### Skript provádí následující operace:
-#####   1. updatuje GIT submodul "script" s inicializačními skripty
-#####   2. zinicializuje Helm repo proti Artifactory
+##### Skript provádí následující operace (ve větvi install):
+#####   1. commitne upravené values / versions / custom
+#####   2. zinicializuje Helm repo proti Artifactory, připraví netrc soubor pro kustomize
 #####   3. vyrenderuje finální manifesty pro ArgoCD na základě vyplněných values, versions a secrets
-##### Po každém kroku následuje GIT commit
+#####   4. commitne vyrenderované manifesty
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
 
@@ -28,17 +28,7 @@ CLUSTER_DIR="$(pwd)"
 ARGO_BRANCH="master"
 INSTALL_BRANCH="install"
 
-git checkout "${ARGO_BRANCH}"
-
-git reset HEAD
-git submodule update --remote script/
-git add script
-if ! git diff --cached --exit-code &>/dev/null; then
-  git commit -m "Updated scripts submodule"
-fi
-
-git branch -D "${INSTALL_BRANCH}"
-git checkout -b "${INSTALL_BRANCH}"
+git checkout "${INSTALL_BRANCH}"
 
 git reset HEAD
 git add values custom
@@ -53,5 +43,3 @@ git add resources
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Rendered deployment"
 fi
-
-git checkout "${ARGO_BRANCH}"

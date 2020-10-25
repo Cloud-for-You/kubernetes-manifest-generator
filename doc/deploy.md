@@ -30,6 +30,7 @@
   * Automatizační skripty nezapisují (s výjimkou iniciálních commitů během `stage1`) z bezpečnostních důvodů přímo do větve master, ale do větve `install`
 * Revizi provedte pomocí `git diff`:
   ```
+  git diff master..install --name-status
   git diff master..install
   ```
 * Zamergování proveďte pomocí `git merge`:

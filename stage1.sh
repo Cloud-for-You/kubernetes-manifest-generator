@@ -18,10 +18,10 @@ CLUSTER_NAME=$1
 ########################################
 ##### Skript provádí následující operace:
 #####   1. naklonuje GIT repozitář daného clusteru z Bitbucket serveru
-#####   2. naklonuje GIT repozitář s inicializačními skripty jako GIT submodul "script"
-#####   3. připraví iniciální obsah v repozitáři
-#####   4. připraví soubor secrets
-##### Po každém kroku následuje GIT commit
+#####   2. naklonuje GIT repozitář s inicializačními skripty jako GIT submodul "script", případně jej updatuje
+#####   3. připraví iniciální obsah v repozitáři a commitne
+#####   4. připraví GIT branch "install"
+#####   5. připraví soubor secrets
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
 
@@ -30,6 +30,7 @@ SECRETS_FILE="ocp-${CLUSTER_NAME}-secrets.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="../init-scripts.git"
 ARGO_BRANCH="master"
+INSTALL_BRANCH="install"
 
 if [ ! -d "${CLUSTER_DIR}" ]; then
   git clone "${CLUSTER_REPO}" "${CLUSTER_DIR}" --recurse-submodules
@@ -48,6 +49,13 @@ if ! git submodule status script &>/dev/null; then
   git submodule add -b master "${SCRIPT_REPO}" script
   git add .gitmodules script
   git commit -m "Scripts submodule"
+else
+  git reset HEAD
+  git submodule update --remote script/
+  git add script
+  if ! git diff --cached --exit-code &>/dev/null; then
+    git commit -m "Updated scripts submodule"
+  fi
 fi
 
 [ -d values ] || cp -r script/init-values/ values
@@ -58,6 +66,13 @@ git add values custom .gitignore
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
+
+if [ ! $(git merge-base --is-ancestor "${ARGO_BRANCH}" "${INSTALL_BRANCH}") ]; then
+  git branch -D "${INSTALL_BRANCH}" || true
+  git checkout -b "${INSTALL_BRANCH}"
+fi
+
+git checkout "${INSTALL_BRANCH}"
 
 popd
 
