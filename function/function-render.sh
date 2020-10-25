@@ -88,27 +88,32 @@ render_custom() {
 
 render_argocd_sys() {
   VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
+  [ -n "${VERSION}" ] || return
   render_helm argocd-deployment-sys "${VERSION}"
 }
 
 render_argocd_app() {
   VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
+  [ -n "${VERSION}" ] || return
   render_helm argocd-deployment-app "${VERSION}"
 }
 
 render_sealed_secrets() {
   VERSION=$(get_component_version SEALED_SECRETS)
+  [ -n "${VERSION}" ] || return
   render_helm sealed-secrets "${VERSION}"
 }
 
 render_bootstrap() {
   VERSION=$(get_component_version BOOTSTRAP)
+  [ -n "${VERSION}" ] || return
   render_helm bootstrap "${VERSION}"
 }
 
 render_project_operator() {
   #TODO change to kustomize in new version of operator
   VERSION=$(get_component_version PROJECT_OPERATOR)
+  [ -n "${VERSION}" ] || return
   render_helm csas-project-operator "${VERSION}"
   cat > "${ROOTDIR}/${FINALDIR}/csas-project-operator/namespace.yaml" <<EOF
 apiVersion: v1
@@ -121,6 +126,7 @@ EOF
 render_application_operator() {
   #TODO change to kustomize in new version of operator
   VERSION=$(get_component_version APPLICATION_OPERATOR)
+  [ -n "${VERSION}" ] || return
   render_helm csas-application-operator "${VERSION}"
   cat > "${ROOTDIR}/${FINALDIR}/csas-application-operator/namespace.yaml" <<EOF
 apiVersion: v1
@@ -138,6 +144,7 @@ render_cluster_config() {
   #TODO resource files using find
   RENDER_NAME=cluster-config
   RENDER_VERSION=$(get_component_version CLUSTER_CONFIG)
+  [ -n "${RENDER_VERSION}" ] || return
 
   rm -rf "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
   mkdir -p "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
