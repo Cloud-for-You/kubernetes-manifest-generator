@@ -68,7 +68,7 @@ if ! git diff --cached --exit-code &>/dev/null; then
 fi
 
 if [ ! $(git merge-base --is-ancestor "${ARGO_BRANCH}" "${INSTALL_BRANCH}") ]; then
-  git branch -D "${INSTALL_BRANCH}" || true
+  git branch -D "${INSTALL_BRANCH}" &>/dev/null || true
   git checkout -b "${INSTALL_BRANCH}"
 fi
 
