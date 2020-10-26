@@ -17,16 +17,22 @@ export SECRETS_FILE=$1
 #####                           jedná se o sobor vytvořený ve STAGE 1 ve stejném adresáři, jako klon GIT repozitáře
 ########################################
 ##### Skript provádí následující operace (ve větvi install):
-#####   1. commitne upravené values / versions / custom
-#####   2. zinicializuje Helm repo proti Artifactory, připraví netrc soubor pro kustomize
-#####   3. vyrenderuje finální manifesty pro ArgoCD na základě vyplněných values, versions a secrets
-#####   4. commitne vyrenderované manifesty
+#####   1. připraví GIT branch "install"
+#####   2. commitne upravené values / versions / custom
+#####   3. zinicializuje Helm repo proti Artifactory, připraví netrc soubor pro kustomize
+#####   4. vyrenderuje finální manifesty pro ArgoCD na základě vyplněných values, versions a secrets
+#####   5. commitne vyrenderované manifesty
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
 
 CLUSTER_DIR="$(pwd)"
 ARGO_BRANCH="master"
 INSTALL_BRANCH="install"
+
+if [ ! $(git merge-base --is-ancestor "${ARGO_BRANCH}" "${INSTALL_BRANCH}") ]; then
+  git branch -D "${INSTALL_BRANCH}" &>/dev/null || true
+  git checkout -b "${INSTALL_BRANCH}"
+fi
 
 git checkout "${INSTALL_BRANCH}"
 

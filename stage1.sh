@@ -20,8 +20,7 @@ CLUSTER_NAME=$1
 #####   1. naklonuje GIT repozitář daného clusteru z Bitbucket serveru
 #####   2. naklonuje GIT repozitář s inicializačními skripty jako GIT submodul "script", případně jej updatuje
 #####   3. připraví iniciální obsah v repozitáři a commitne
-#####   4. připraví GIT branch "install"
-#####   5. připraví soubor secrets
+#####   4 připraví soubor secrets
 ##### Skript je znovuspustitelný
 ################################################################################################################################################################
 
@@ -66,13 +65,6 @@ git add values custom .gitignore
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
-
-if [ ! $(git merge-base --is-ancestor "${ARGO_BRANCH}" "${INSTALL_BRANCH}") ]; then
-  git branch -D "${INSTALL_BRANCH}" &>/dev/null || true
-  git checkout -b "${INSTALL_BRANCH}"
-fi
-
-git checkout "${INSTALL_BRANCH}"
 
 popd
 
