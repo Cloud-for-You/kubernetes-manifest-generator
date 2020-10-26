@@ -52,14 +52,14 @@ get_component_version() {
 }
 
 prepare_local_render() {
-  echo mkdir -p "${ROOTDIR}/.local"
-  echo ln -s XXXXX/argocd-deployment-sys "${ROOTDIR}/.local/argocd-deployment-sys"
-  echo ln -s XXXXX/argocd-deployment-app "${ROOTDIR}/.local/argocd-deployment-app"
-  echo ln -s XXXXX/sealed-secrets "${ROOTDIR}/.local/sealed-secrets"
-  echo ln -s XXXXX/bootstrap "${ROOTDIR}/.local/bootstrap"
-  echo ln -s XXXXX/deploy/ "${ROOTDIR}/.local/csas-project-operator"
-  echo ln -s XXXXX/deploy/ "${ROOTDIR}/.local/csas-application-operator"
-  echo ln -s XXXXX/ "${ROOTDIR}/.local/cluster-config"
+  mkdir -p "${ROOTDIR}/.local"
+  ln -s "${ROOTDIR}/../helm-argocd/argocd-deployment-sys" "${ROOTDIR}/.local/argocd-deployment-sys"
+  ln -s "${ROOTDIR}/../helm-argocd/argocd-deployment-app" "${ROOTDIR}/.local/argocd-deployment-app"
+  ln -s "${ROOTDIR}/../helm-sealedsecrets/sealed-secrets" "${ROOTDIR}/.local/sealed-secrets"
+  ln -s "${ROOTDIR}/../helm-argocd-sys-application/bootstrap" "${ROOTDIR}/.local/bootstrap"
+  ln -s "${ROOTDIR}/../csas-project-operator/config" "${ROOTDIR}/.local/csas-project-operator"
+  ln -s "${ROOTDIR}/../csas-application-operator/config" "${ROOTDIR}/.local/csas-application-operator"
+  # echo ln -s XXXXX/ "${ROOTDIR}/.local/cluster-config"
 }
 
 render_helm() {
