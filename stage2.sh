@@ -29,7 +29,7 @@ CLUSTER_DIR="$(pwd)"
 ARGO_BRANCH="master"
 INSTALL_BRANCH="install"
 
-if [ ! $(git merge-base --is-ancestor "${ARGO_BRANCH}" "${INSTALL_BRANCH}") ]; then
+if ! git merge-base --is-ancestor "${ARGO_BRANCH}" "${INSTALL_BRANCH}"; then
   git checkout "${ARGO_BRANCH}"
   git branch -D "${INSTALL_BRANCH}" &>/dev/null || true
   git checkout -b "${INSTALL_BRANCH}"
