@@ -38,6 +38,13 @@ fi
 git checkout "${INSTALL_BRANCH}"
 
 git reset HEAD
+git submodule update --remote script/
+git add script
+if ! git diff --cached --exit-code &>/dev/null; then
+  git commit -m "Updated scripts submodule"
+fi
+
+git reset HEAD
 git add values custom
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Cluster configuration"
