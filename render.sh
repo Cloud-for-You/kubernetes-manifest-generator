@@ -6,6 +6,7 @@ set -e -u
 export SECRETS_FILE
 
 init
+render_clean
 render_argocd_sys
 render_argocd_app
 render_bootstrap

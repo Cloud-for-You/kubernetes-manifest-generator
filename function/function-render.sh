@@ -61,6 +61,10 @@ prepare_local_render() {
   # echo ln -s XXXXX/ "${ROOTDIR}/.local/cluster-config"
 }
 
+render_clean() {
+ rm -rf ${ROOTDIR}/${TEMPDIR} ${ROOTDIR}/${FINALDIR}
+}
+
 render_helm() {
   RENDER_NAME=$1
   RENDER_VERSION=$2
