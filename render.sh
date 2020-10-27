@@ -8,7 +8,6 @@ export SECRETS_FILE
 init
 render_argocd_sys
 render_argocd_app
-render_sealed_secrets
 render_bootstrap
 render_project_operator
 render_application_operator

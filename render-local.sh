@@ -8,7 +8,6 @@ if [ -d ".local" ]; then
   RENDER_LOCAL=1
   [ -d .local/argocd-deployment-sys ] && render_argocd_sys
   [ -d .local/argocd-deployment-app ] && render_argocd_app
-  [ -d .local/sealed-secrets ] && render_sealed_secrets
   [ -d .local/bootstrap ] && render_bootstrap
   # render_cluster_config
   [ -d .local/csas-project-operator ] && render_project_operator

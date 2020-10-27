@@ -55,7 +55,6 @@ prepare_local_render() {
   mkdir -p "${ROOTDIR}/.local"
   ln -s "${ROOTDIR}/../helm-argocd/argocd-deployment-sys" "${ROOTDIR}/.local/argocd-deployment-sys"
   ln -s "${ROOTDIR}/../helm-argocd/argocd-deployment-app" "${ROOTDIR}/.local/argocd-deployment-app"
-  ln -s "${ROOTDIR}/../helm-sealedsecrets/sealed-secrets" "${ROOTDIR}/.local/sealed-secrets"
   ln -s "${ROOTDIR}/../helm-argocd-sys-application/bootstrap" "${ROOTDIR}/.local/bootstrap"
   ln -s "${ROOTDIR}/../csas-project-operator/config" "${ROOTDIR}/.local/csas-project-operator"
   ln -s "${ROOTDIR}/../csas-application-operator/config" "${ROOTDIR}/.local/csas-application-operator"
@@ -173,12 +172,6 @@ render_argocd_app() {
   VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
   [ -n "${VERSION}" ] || return
   render_helm argocd-deployment-app "${VERSION}"
-}
-
-render_sealed_secrets() {
-  VERSION=$(get_component_version SEALED_SECRETS)
-  [ -n "${VERSION}" ] || return
-  render_helm sealed-secrets "${VERSION}"
 }
 
 render_bootstrap() {
