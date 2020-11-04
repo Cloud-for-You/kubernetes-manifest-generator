@@ -144,7 +144,7 @@ kind: Kustomization
 resources:
   - ${RENDER_NAME}-${RENDER_VERSION}.zip/
 
-namespace: csas-application-operator
+namespace: ${RENDER_NAME}
 
 configMapGenerator:
   - name: controller-manager
