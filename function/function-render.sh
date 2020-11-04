@@ -192,10 +192,9 @@ render_bootstrap() {
 }
 
 render_project_operator() {
-  #TODO change to kustomize in new version of operator
   VERSION=$(get_component_version PROJECT_OPERATOR)
   [ -n "${VERSION}" ] || return 0
-  render_helm csas-project-operator "${VERSION}"
+  render_kustomize csas-project-operator "${VERSION}"
   cat > "${ROOTDIR}/${FINALDIR}/csas-project-operator/~g_v1_namespace_csas-project-operator.yaml" <<EOF
 apiVersion: v1
 kind: Namespace
@@ -205,7 +204,6 @@ EOF
 }
 
 render_application_operator() {
-  #TODO change to kustomize in new version of operator
   VERSION=$(get_component_version APPLICATION_OPERATOR)
   [ -n "${VERSION}" ] || return 0
   render_kustomize csas-application-operator "${VERSION}"
