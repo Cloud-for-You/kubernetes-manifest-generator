@@ -220,42 +220,7 @@ render_custom_resources() {
 }
 
 render_cluster_config() {
-  #TODO resource files using find
-  RENDER_NAME=cluster-config
-  RENDER_VERSION=$(get_component_version CLUSTER_CONFIG)
-  [ -n "${RENDER_VERSION}" ] || return 0
-
-  rm -rf "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
-  mkdir -p "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}"
-  rm -rf "${ROOTDIR}/${FINALDIR}/${RENDER_NAME}"
-  mkdir -p "${ROOTDIR}/${FINALDIR}/${RENDER_NAME}"
-
-  if [ -z "${RENDER_LOCAL}" ]; then
-    helm pull "${HELM_ARTIFACTORY}/${RENDER_NAME}" --version "${RENDER_VERSION}" --destination "${ROOTDIR}/${TEMPDIR}/"
-    HELM_CHART="${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}-${RENDER_VERSION}.tgz"
-  else
-    HELM_CHART="${ROOTDIR}/.local/${RENDER_NAME}"
-    RENDER_VERSION=v0.0.0
-  fi
-
-  echo "Rendering ${RENDER_NAME} - ${RENDER_VERSION}"
-
-  yq read -X "${ROOTDIR}/values/values.yaml" "${RENDER_NAME}" > "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml"
-  helm lint "${HELM_CHART}" -f "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml" --strict --skip-headers --with-subcharts | grep -v "0 chart(s) failed" | grep -v "icon is recommended" | grep .
-  helm template "${HELM_CHART}" -f "${ROOTDIR}/${TEMPDIR}/values_${RENDER_NAME}.yaml" --output-dir "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/"
-
-  cat <<EOF > "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/kustomization.yaml"
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-resources:
-  - init-cluster/templates/cluster-config/99-chrony.yaml
-  - init-cluster/templates/cluster-config/99-mirror-registry.yaml
-EOF
-  kustomize build "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}" -o "${ROOTDIR}/${FINALDIR}/${RENDER_NAME}"
-
-  rm -rf "${ROOTDIR}/install"
-  cp -r "${ROOTDIR}/${TEMPDIR}/${RENDER_NAME}/init-cluster/templates/install-config" "${ROOTDIR}/install"
-
-  echo "Rendered ${RENDER_NAME} - ${RENDER_VERSION}"
+  VERSION=$(get_component_version CLUSTER_CONFIG)
+  [ -n "${VERSION}" ] || return 0
+  render_helm cluster_config "${VERSION}"
 }

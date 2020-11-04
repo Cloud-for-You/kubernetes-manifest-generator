@@ -7,6 +7,7 @@ export SECRETS_FILE
 
 init
 render_clean
+render_cluster_config
 render_argocd_sys
 render_argocd_app
 render_sealed_secrets
