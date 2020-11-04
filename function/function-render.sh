@@ -222,5 +222,5 @@ render_custom_resources() {
 render_cluster_config() {
   VERSION=$(get_component_version CLUSTER_CONFIG)
   [ -n "${VERSION}" ] || return 0
-  render_helm cluster_config "${VERSION}"
+  render_helm cluster-config "${VERSION}"
 }
