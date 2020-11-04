@@ -1,6 +1,6 @@
 . $(dirname $0)/function/function-common.sh
 
-HELM_ARTIFACTORY='ocp-artifactory'
+HELM_ARTIFACTORY='csas-helmcharts'
 NETRC_FILE=~/.netrc-${HELM_ARTIFACTORY}
 KUSTOMIZE_SUBDIR=csas
 
