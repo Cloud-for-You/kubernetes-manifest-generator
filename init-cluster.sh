@@ -59,6 +59,7 @@ if [ ! -d values ]; then
   rename -v '.tmpl' '' values/*.tmpl
 fi
 [ -d custom ] || cp -r script/init-custom/ custom
+[ -d .secrets ] || mkdir .secrets
 [ -f .gitignore ] || cp script/init/.gitignore ./
 
 git reset HEAD
@@ -70,7 +71,7 @@ fi
 
 popd
 
-[ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
+[ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" ./secrets/"${SECRETS_FILE}"
 
 
 echo "${GREEN}"
