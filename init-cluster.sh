@@ -7,14 +7,14 @@ GREEN=`tput setaf 2`
 NC=`tput sgr0`        # No Color
 
 while getopts ":n:" opts; do
-    case "${opts}" in
-        n)
-            CLUSTER_NAME=${OPTARG}
-            ;;
-        *)
-            usage
-            ;;
-    esac
+  case "${opts}" in
+    n)
+      CLUSTER_NAME=${OPTARG}
+      ;;
+    *)
+      usage
+      ;;
+  esac
 done
 shift $((OPTIND-1))
 
