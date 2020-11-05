@@ -69,13 +69,13 @@ if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
 
+[ -f .secrets/"${SECRETS_FILE}" ] || cp "script/init-secrets/secrets.yaml" .secrets/"${SECRETS_FILE}"
+
 popd
-
-[ -f "${SECRETS_FILE}" ] || cp "${CLUSTER_DIR}/script/init-secrets/secrets.yaml" ./secrets/"${SECRETS_FILE}"
-
 
 echo "${GREEN}"
 echo "Ostatni spusteni scriptu se musi provadet vzdy z adresare ${CLUSTER_DIR}"
-echo "Upravte hodnoty v patricnych souborech v adresari  ${CLUSTER_DIR}/values"
+echo "Upravte soubory v adresari  ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.secrets"
+echo "Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto"
 echo "Vygenerujte sablony pro cluster spustenim \"bash scripts/stage1.sh\""
 echo "${NC}"
