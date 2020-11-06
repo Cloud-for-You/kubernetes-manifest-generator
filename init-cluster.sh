@@ -23,7 +23,7 @@ if [ -z "${CLUSTER_NAME}" ]; then
 fi
 
 CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
-SECRETS_FILE="ocp-${CLUSTER_NAME}-secrets.yaml"
+SECRETS_FILE=".secrets/ocp-${CLUSTER_NAME}-secrets.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="ssh://git@sdf.csin.cz:2222/OCP4/init-scripts.git"
 
@@ -69,7 +69,7 @@ if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
 
-[ -f .secrets/"${SECRETS_FILE}" ] || cp "script/init-secrets/secrets.yaml" .secrets/"${SECRETS_FILE}"
+[ -f "${SECRETS_FILE}" ] || cp "script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
 
 popd
 
