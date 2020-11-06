@@ -1,15 +1,18 @@
 #!/bin/bash
 
-usage() { echo "Usage: $0 -n <CLUSTER NAME>" 1>&2; exit 1; }
+usage() { echo "Usage: $0 -n <CLUSTER NAME> -v <OPENSHIFT VERSION>" 1>&2; exit 1; }
 
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
 NC=`tput sgr0`        # No Color
 
-while getopts ":n:" opts; do
+while getopts ":n:v:" opts; do
   case "${opts}" in
     n)
       CLUSTER_NAME=${OPTARG}
+      ;;
+    v)
+      OPENSHIFT_VERSION=${OPTARG}
       ;;
     *)
       usage
@@ -18,7 +21,7 @@ while getopts ":n:" opts; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${CLUSTER_NAME}" ]; then
+if [ -z "${CLUSTER_NAME}" ] || [ -z "${OPENSHIFT_VERSION}" ]; then
     usage
 fi
 
@@ -61,6 +64,7 @@ fi
 [ -d custom ] || cp -r script/init-custom/ custom
 [ -d .secrets ] || mkdir .secrets
 [ -f .gitignore ] || cp script/init/.gitignore ./
+[ -d tmp ] || mkdir tmp
 
 git reset HEAD
 git add values custom .gitignore
@@ -71,11 +75,30 @@ fi
 
 [ -f "${SECRETS_FILE}" ] || cp "script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
 
+helm repo update
+helm template csas-helmcharts/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config 
+if [ $? -ne 0 ]; then
+  echo "${RED}"
+  echo "Neexistujici verze helmchartu pro odpovidajici verzi OpenShiftu"
+  echo "Podporovane verze zjistite prikazem"
+  echo "  ${GREEN}$ helm search repo install-config -l${RED}"
+  echo "${NC}"
+  popd
+  rm -rf ${CLUSTER_DIR}
+  exit 1
+fi
+mv install-config/install-config/templates/install-config.yaml install-config/
+rm -rf install-config/install-config/ 
+mv ../values.yaml values/install-config.yaml
+
+
 popd
 
 echo "${GREEN}"
 echo "Ostatni spusteni scriptu se musi provadet vzdy z adresare ${CLUSTER_DIR}"
 echo "Upravte soubory v adresari  ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.secrets"
 echo "Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto"
-echo "Vygenerujte sablony pro cluster spustenim \"bash scripts/stage1.sh\""
+echo ""
+echo "Vygenerujte sablony pro cluster spustenim"
+echo "  ${GREEN}$ bash scripts/stage1.sh${RED}"
 echo "${NC}"
