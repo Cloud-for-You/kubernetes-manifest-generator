@@ -89,16 +89,24 @@ if [ $? -ne 0 ]; then
 fi
 mv install-config/install-config/templates/install-config.yaml install-config/
 rm -rf install-config/install-config/ 
-mv ../values.yaml values/install-config.yaml
+mv ../values.yaml values/cluster-config.yaml
 
+git reset HEAD
+git add install-config/ values/cluster-config.yaml 
+if ! git diff --cached --exit-code &>/dev/null; then
+  git commit -m "Add install-config.yaml"
+fi
 
 popd
 
-echo "${GREEN}"
+echo "${RED}"
+echo "1. Spustte instalaci clusteru."
+echo "  ${GREEN}$ openshift-install create cluster --dir ${CLUSTER_DIR}/install-config/ --log-level debug${RED}"
+echo ""
 echo "Ostatni spusteni scriptu se musi provadet vzdy z adresare ${CLUSTER_DIR}"
 echo "Upravte soubory v adresari  ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.secrets"
 echo "Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto"
 echo ""
 echo "Vygenerujte sablony pro cluster spustenim"
-echo "  ${GREEN}$ bash scripts/stage1.sh${RED}"
+echo "  ${GREEN}$ bash scripts/stage2.sh${RED}"
 echo "${NC}"
