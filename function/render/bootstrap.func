@@ -1,0 +1,5 @@
+render_bootstrap() {
+  VERSION=$(get_component_version BOOTSTRAP)
+  [ -n "${VERSION}" ] || return 0
+  render_helm bootstrap "${VERSION}"
+}

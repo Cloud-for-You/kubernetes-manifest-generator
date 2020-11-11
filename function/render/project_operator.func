@@ -1,0 +1,11 @@
+render_project_operator() {
+  VERSION=$(get_component_version PROJECT_OPERATOR)
+  [ -n "${VERSION}" ] || return 0
+  render_kustomize csas-project-operator "${VERSION}"
+  cat > "${ROOTDIR}/${FINALDIR}/csas-project-operator/~g_v1_namespace_csas-project-operator.yaml" <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: csas-project-operator
+EOF
+}

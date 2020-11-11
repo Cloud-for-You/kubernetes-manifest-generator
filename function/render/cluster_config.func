@@ -1,0 +1,5 @@
+render_cluster_config() {
+  VERSION=$(get_component_version CLUSTER_CONFIG)
+  [ -n "${VERSION}" ] || return 0
+  render_helm cluster-config "${VERSION}"
+}
