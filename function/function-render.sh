@@ -20,7 +20,7 @@ init_helm_repo() {
     CAOPTS="--ca-file ${CAFILE}"
   fi
 
-#  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
+  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
   #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
 }
 
@@ -33,11 +33,11 @@ init_kustomize_netrc() {
   ARTIF_HOST=${ARTIF_URL#*://}
   ARTIF_HOST=${ARTIF_HOST%%/*}
 
-#  cat > ${NETRC_FILE} <<EOF
-#machine ${ARTIF_HOST}
-#  login ${ARTIF_USER}
-#  password ${ARTIF_PASSWORD}
-#EOF
+  cat > ${NETRC_FILE} <<EOF
+machine ${ARTIF_HOST}
+  login ${ARTIF_USER}
+  password ${ARTIF_PASSWORD}
+EOF
 }
 
 update_helm_repo() {
@@ -47,7 +47,7 @@ update_helm_repo() {
 
 init() {
   update_helm_repo
-  init_kustomize_netrc
+#  init_kustomize_netrc
 }
 
 get_component_version() {
