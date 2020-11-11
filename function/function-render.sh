@@ -1,5 +1,10 @@
 . $(dirname $0)/function/function-common.sh
 
+#echo  $(dirname $0)/function/render/
+for function_file in `find $(dirname $0)/function/render/ -name *.func`; do
+  . ${function_file}
+done
+
 HELM_ARTIFACTORY='csas-helmcharts'
 NETRC_FILE=~/.netrc-${HELM_ARTIFACTORY}
 KUSTOMIZE_SUBDIR=csas
@@ -15,7 +20,7 @@ init_helm_repo() {
     CAOPTS="--ca-file ${CAFILE}"
   fi
 
-  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
+#  helm repo add ${CAOPTS} "${HELM_ARTIFACTORY}" "${ARTIF_URL}" --username "${ARTIF_USER}" --password "${ARTIF_PASSWORD}"
   #TODO vyresit, kdyz nebudu mit secrets, pripadne z cmdline jako read (a bude personalni ucet a nebudu brat ze secrets) - bude se spoustet z bastion
 }
 
@@ -28,15 +33,15 @@ init_kustomize_netrc() {
   ARTIF_HOST=${ARTIF_URL#*://}
   ARTIF_HOST=${ARTIF_HOST%%/*}
 
-  cat > ${NETRC_FILE} <<EOF
-machine ${ARTIF_HOST}
-  login ${ARTIF_USER}
-  password ${ARTIF_PASSWORD}
-EOF
+#  cat > ${NETRC_FILE} <<EOF
+#machine ${ARTIF_HOST}
+#  login ${ARTIF_USER}
+#  password ${ARTIF_PASSWORD}
+#EOF
 }
 
 update_helm_repo() {
-  init_helm_repo || true
+#  init_helm_repo || true
   helm repo update
 }
 
@@ -165,62 +170,4 @@ render_custom() {
   echo "Rendering custom-${RENDER_NAME}"
   cp -r "custom/${RENDER_NAME}" "${ROOTDIR}/${FINALDIR}/custom-${RENDER_NAME}"
   echo "Rendered custom-${RENDER_NAME}"
-}
-
-render_argocd_sys() {
-  VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
-  [ -n "${VERSION}" ] || return 0
-  render_helm argocd-deployment-sys "${VERSION}"
-}
-
-render_argocd_app() {
-  VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
-  [ -n "${VERSION}" ] || return 0
-  render_helm argocd-deployment-app "${VERSION}"
-}
-
-render_sealed_secrets() {
-  VERSION=$(get_component_version SEALED_SECRETS)
-  [ -n "${VERSION}" ] || return 0
-  render_helm sealed-secrets "${VERSION}"
-}
-
-render_bootstrap() {
-  VERSION=$(get_component_version BOOTSTRAP)
-  [ -n "${VERSION}" ] || return 0
-  render_helm bootstrap "${VERSION}"
-}
-
-render_project_operator() {
-  VERSION=$(get_component_version PROJECT_OPERATOR)
-  [ -n "${VERSION}" ] || return 0
-  render_kustomize csas-project-operator "${VERSION}"
-  cat > "${ROOTDIR}/${FINALDIR}/csas-project-operator/~g_v1_namespace_csas-project-operator.yaml" <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: csas-project-operator
-EOF
-}
-
-render_application_operator() {
-  VERSION=$(get_component_version APPLICATION_OPERATOR)
-  [ -n "${VERSION}" ] || return 0
-  render_kustomize csas-application-operator "${VERSION}"
-  cat > "${ROOTDIR}/${FINALDIR}/csas-application-operator/~g_v1_namespace_csas-application-operator.yaml" <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: csas-application-operator
-EOF
-}
-
-render_custom_resources() {
-  render_custom 'resources'
-}
-
-render_cluster_config() {
-  VERSION=$(get_component_version CLUSTER_CONFIG)
-  [ -n "${VERSION}" ] || return 0
-  render_helm cluster-config "${VERSION}"
 }
