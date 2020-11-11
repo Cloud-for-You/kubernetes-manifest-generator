@@ -5,8 +5,9 @@ set -e -u
 
 export SECRETS_FILE
 
-init
 render_clean
+
+# Komponenty k renderovani
 render_cluster_config
 render_argocd_sys
 render_argocd_app

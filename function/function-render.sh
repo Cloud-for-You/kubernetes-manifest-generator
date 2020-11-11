@@ -45,11 +45,6 @@ update_helm_repo() {
   helm repo update
 }
 
-init() {
-  update_helm_repo
-#  init_kustomize_netrc
-}
-
 get_component_version() {
   COMP=$1
   VERSION=$(yq r "${ROOTDIR}/values/versions.yaml" "${COMP}")
