@@ -1,43 +1,44 @@
-auth:
-  AAD:
-    tenantID:
-    clientID:
-    clientSecret:
-
-certs:
-  api:
-    crt: |
-      -----BEGIN CERTIFICATE-----
-      MIIG6zCCBdOgAwIBAgITYwAayOoFpyMCKGl4jwABABrI6jANBgkqhkiG9w0BAQsF
-      ...
-      -----END CERTIFICATE-----
-    key: |
-      -----BEGIN RSA PRIVATE KEY-----
-      MIIEpAIBAAKCAQEA5CHbZUn76xkxN46ESEm407/7PURO5xKc3cnInnPcpzIC7W7k
-      ...
-      -----END RSA PRIVATE KEY-----
-    ca: |
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
-  ingress:
-    crt: |
-      -----BEGIN CERTIFICATE-----
-      MIIG6zCCBdOgAwIBAgITYwAayOoFpyMCKGl4jwABABrI6jANBgkqhkiG9w0BAQsF
-      ...
-      -----END CERTIFICATE-----
-    key: |
-      -----BEGIN RSA PRIVATE KEY-----
-      MIIEpAIBAAKCAQEA5CHbZUn76xkxN46ESEm407/7PURO5xKc3cnInnPcpzIC7W7k
-      ...
-      -----END RSA PRIVATE KEY-----
-    ca: |
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
+cluster-config:
+  auth:
+    AAD:
+      tenantID:
+      clientID:
+      clientSecret:
+  
+  certs:
+    api:
+      crt: |
+        -----BEGIN CERTIFICATE-----
+        MIIG6zCCBdOgAwIBAgITYwAayOoFpyMCKGl4jwABABrI6jANBgkqhkiG9w0BAQsF
+        ...
+        -----END CERTIFICATE-----
+      key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEA5CHbZUn76xkxN46ESEm407/7PURO5xKc3cnInnPcpzIC7W7k
+        ...
+        -----END RSA PRIVATE KEY-----
+      ca: |
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+    ingress:
+      crt: |
+        -----BEGIN CERTIFICATE-----
+        MIIG6zCCBdOgAwIBAgITYwAayOoFpyMCKGl4jwABABrI6jANBgkqhkiG9w0BAQsF
+        ...
+        -----END CERTIFICATE-----
+      key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEA5CHbZUn76xkxN46ESEm407/7PURO5xKc3cnInnPcpzIC7W7k
+        ...
+        -----END RSA PRIVATE KEY-----
+      ca: |
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
