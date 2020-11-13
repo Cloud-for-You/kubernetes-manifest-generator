@@ -10,6 +10,8 @@ for function_file in `find $(dirname $0)/function/ -name *.func`; do
   . ${function_file}
 done
 
+[ -d ${ROOTDIR}/resources ] || mkdir -p ${ROOTDIR}/resources
+
 clean
 getComponents
 

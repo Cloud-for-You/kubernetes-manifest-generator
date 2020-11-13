@@ -1,6 +1,10 @@
 render_helm() {
-  local helmchart=${1}
-  local version=${2}
+  local helmchart="${1}"
+  local version="${2}"
+  local repository="${3:-csas-helmcharts}"
+
+  local values_file="values/${helmchart}.yaml"
+  echo ${values_file}
 
   echo "${GREEN}Render helm component: ${name} ${version}${NC}"
 
@@ -9,4 +13,8 @@ render_helm() {
     echo "${RED}v repository neni Helmchart ${helmchart} ve verzi ${version} k dispozici${NC}"
     return;
   fi
+
+  # Provedeme render daneho deploymentu
+  yq read ${values_file} "${helmchart}" | helm template "${repository}/${helmchart}" -f - --include-crds --output-dir render
+
 }
