@@ -1,0 +1,12 @@
+render_helm() {
+  local helmchart=${1}
+  local version=${2}
+
+  echo "${GREEN}Render helm component: ${name} ${version}${NC}"
+
+  # Check search helmchart
+  if [ "$(helm search repo ${helmchart} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
+    echo "${RED}v repository neni Helmchart ${helmchart} ve verzi ${version} k dispozici${NC}"
+    return;
+  fi
+}

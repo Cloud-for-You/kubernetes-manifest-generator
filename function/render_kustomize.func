@@ -1,0 +1,6 @@
+render_kustomize() {
+  local helmchart=${1}
+  local version=${2}
+
+  echo "${GREEN}Render kustomize component: ${name} ${version} ${type}${NC}"
+}

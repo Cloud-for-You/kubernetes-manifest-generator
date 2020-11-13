@@ -1,3 +1,0 @@
-render_custom_resources() {
-  render_custom 'resources'
-}

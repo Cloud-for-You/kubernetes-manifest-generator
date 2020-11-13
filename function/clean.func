@@ -1,0 +1,4 @@
+clean() {
+  echo ${ROOTDIR}/resources
+  rm -rf ${ROOTDIR}/resources
+}

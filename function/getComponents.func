@@ -1,0 +1,13 @@
+getComponents() {
+  for component in $(yq read values/components.yaml --printMode p "*"); do
+    local num=$(yq read values/components.yaml --length "${component}")
+
+    for ((i = 0; i < "${num}"; ++i )); do
+      local name=$(yq read values/components.yaml "${component}[${i}].name")
+      local version=$(yq read values/components.yaml "${component}[${i}].version")
+      local type=$(yq read values/components.yaml --defaultValue helm "${component}[${i}].type")
+
+      render_${type} ${name} ${version}
+    done
+  done
+}

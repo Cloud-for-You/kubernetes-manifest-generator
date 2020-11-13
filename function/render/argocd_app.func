@@ -1,5 +1,0 @@
-render_argocd_app() {
-  VERSION=$(get_component_version ARGOCD_DEPLOYMENT)
-  [ -n "${VERSION}" ] || return 0
-  render_helm argocd-deployment-app "${VERSION}"
-}
