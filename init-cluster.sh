@@ -89,11 +89,11 @@ if [ $? -ne 0 ]; then
 fi
 mv install-config/install-config/templates/install-config.yaml install-config/
 rm -rf install-config/install-config/ 
-yq delete -i values_init-cluster.yaml 'platform'
-yq delete -i values_init-cluster.yaml 'azure'
-yq delete -i values_init-cluster.yaml 'proxy'
-yq delete -i values_init-cluster.yaml 'pullSecret'
-yq delete -i values_init-cluster.yaml 'sshKey'
+yq delete -i ../values_init-cluster.yaml 'platform'
+yq delete -i ../values_init-cluster.yaml 'azure'
+yq delete -i ../values_init-cluster.yaml 'proxy'
+yq delete -i ../values_init-cluster.yaml 'pullSecret'
+yq delete -i ../values_init-cluster.yaml 'sshKey'
 mv ../values_init-cluster.yaml values/global.yaml
 
 git reset HEAD
