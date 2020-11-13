@@ -29,6 +29,9 @@ CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
 SECRETS_FILE=".secrets/ocp-${CLUSTER_NAME}-secrets.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="ssh://git@sdf.csin.cz:2222/OCP4/init-scripts.git"
+PLATFORM=$(yq read values_init-cluster.yaml 'platform')
+
+echo ${PLATFORM}
 
 # Naklonujeme repository
 if [ ! -d "${CLUSTER_DIR}" ]; then
@@ -104,14 +107,16 @@ fi
 
 popd
 
-echo "${RED}"
-echo "1. Spustte instalaci clusteru."
-echo "  ${GREEN}$ openshift-install create cluster --dir ${CLUSTER_DIR}/install-config/ --log-level debug${RED}"
+if [ ${PLATFORM} == "none" ]; then
+  echo "${RED}Vygenerujte ign soubory pro distribuci na COREOS pomoci TFTP${NC}"
+fi
 echo ""
-echo "Ostatni spusteni scriptu se musi provadet vzdy z adresare ${CLUSTER_DIR}"
-echo "Upravte soubory v adresari  ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.secrets"
-echo "Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto"
+echo "${RED}Spustte instalaci clusteru${NC}"
+echo "  ${GREEN}$ openshift-install create cluster --dir ${CLUSTER_DIR}/install-config/ --log-level debug${NC}"
 echo ""
-echo "Vygenerujte sablony pro cluster spustenim"
-echo "  ${GREEN}$ bash scripts/stage2.sh${RED}"
-echo "${NC}"
+echo "${RED}Ostatni spusteni scriptu se musi provadet vzdy z adresare ${CLUSTER_DIR}${NC}"
+echo "${RED}Upravte soubory v adresari  ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.secrets${NC}"
+echo "${RED}Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto${NC}"
+echo ""
+echo "${RED}Vygenerujte sablony pro cluster spustenim${NC}"
+echo "  ${GREEN}$ bash scripts/stage2.sh${NC}"
