@@ -1,11 +1,11 @@
-ARGOCD_DEPLOYMENT: v0.0.0
-  - name: argocd-sys
-    version: v0.0.0
+ARGOCD:
+  - name: argocd-deployment-sys
+    version: v0.7.3
     type: helm 
-  - name: argocd-app
-    version: v0.0.0
+  - name: argocd-deployment-app
+    version: v0.7.3
     type: helm
 CLUSTER_CONFIG:
   - name: cluster-config
-    version: v0.0.0
+    version: v0.1.0
     type: helm
