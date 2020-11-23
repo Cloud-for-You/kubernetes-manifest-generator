@@ -119,4 +119,4 @@ echo "${RED}Upravte soubory v adresari ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.s
 echo "${RED}Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto${NC}"
 echo ""
 echo "${RED}Vygenerujte sablony pro cluster spustenim${NC}"
-echo "  ${GREEN}$ bash scripts/stage2.sh${NC}"
+echo "  ${GREEN}$ bash scripts/render_resources.sh${NC}"
