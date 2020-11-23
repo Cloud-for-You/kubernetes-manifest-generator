@@ -100,7 +100,7 @@ yq delete -i ../values.yaml 'sshKey'
 mv ../values.yaml values/global.yaml
 
 git reset HEAD
-git add install-config/ values/cluster-config.yaml 
+git add install-config/ values/cluster-config.yaml values/global.yaml 
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Add install-config.yaml"
 fi
