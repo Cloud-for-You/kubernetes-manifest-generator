@@ -93,6 +93,12 @@ fi
 mv install-config/install-config/templates/install-config.yaml install-config/
 rm -rf install-config/install-config/ 
 
+BASE_DOMAIN=$(yq read ../values.yaml baseDomain)
+CLUSTER_NAME=$(yq read ../values.yaml clusterName)
+
+yq write -i values/global.yaml 'baseDomain' ${BASE_DOMAIN} --anchorName baseDomain
+yq write -i values/global.yaml 'clusterName' ${CLUSTER_NAME} --anchorName clusterName
+
 # kopirovani dvou hlavnich promennych do globalniho values souboru
 #yq delete -i ../values.yaml 'platform'
 #yq delete -i ../values.yaml 'azure'
@@ -100,7 +106,7 @@ rm -rf install-config/install-config/
 #yq delete -i ../values.yaml 'pullSecret'
 #yq delete -i ../values.yaml 'sshKey'
 
-#mv ../values.yaml values/global.yaml
+rm -f ../values.yaml 
 
 git reset HEAD
 git add install-config/ values/cluster-config.yaml values/global.yaml 
