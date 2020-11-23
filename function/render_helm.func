@@ -3,10 +3,12 @@ render_helm() {
   local version="${2}"
   local repository="${3:-csas-helmcharts}"
 
-  local values_file="values/${helmchart}.yaml"
-  echo ${values_file}
+  cat values/global.yaml values/${helmchart}.yaml | yq read -X - | yq read - ${helmchart} > tmp/${helmchart}.yaml
+
+  local values_file="tmp/${helmchart}.yaml"
 
   echo "${GREEN}Render helm component: ${name} ${version}${NC}"
+  echo "Value files: ${values_file}"
 
   # Check search helmchart
   if [ "$(helm search repo ${helmchart} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
