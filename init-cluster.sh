@@ -92,12 +92,15 @@ if [ $? -ne 0 ]; then
 fi
 mv install-config/install-config/templates/install-config.yaml install-config/
 rm -rf install-config/install-config/ 
-yq delete -i ../values.yaml 'platform'
-yq delete -i ../values.yaml 'azure'
-yq delete -i ../values.yaml 'proxy'
-yq delete -i ../values.yaml 'pullSecret'
-yq delete -i ../values.yaml 'sshKey'
-mv ../values.yaml values/global.yaml
+
+# kopirovani dvou hlavnich promennych do globalniho values souboru
+#yq delete -i ../values.yaml 'platform'
+#yq delete -i ../values.yaml 'azure'
+#yq delete -i ../values.yaml 'proxy'
+#yq delete -i ../values.yaml 'pullSecret'
+#yq delete -i ../values.yaml 'sshKey'
+
+#mv ../values.yaml values/global.yaml
 
 git reset HEAD
 git add install-config/ values/cluster-config.yaml values/global.yaml 
