@@ -17,6 +17,6 @@ render_helm() {
   fi
 
   # Provedeme render daneho deploymentu
-  helm template "${repository}/${helmchart}" -f ${values_file} --include-crds --output-dir render
+  helm template "${repository}/${helmchart}" -f ${values_file} --include-crds --output-dir tmp/render
 
 }
