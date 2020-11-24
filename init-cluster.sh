@@ -36,13 +36,16 @@ if [ -z "${CLUSTER_NAME}" ] || [ -z "${OPENSHIFT_VERSION}" ]; then
     usage
 fi
 
+if [ ! -f values.yaml ]; then
+  echo "${RED}Neexistuje soubor s konfiguracnimi parametry values.yaml${NC}"
+  exit 1
+fi
+
 CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
 SECRETS_FILE=".secrets/ocp-${CLUSTER_NAME}-secrets.yaml"
-CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/OCP4/${CLUSTER_DIR}.git"
-SCRIPT_REPO="ssh://git@sdf.csin.cz:2222/OCP4/init-scripts.git"
-PLATFORM=$(yq read values_init-cluster.yaml 'platform')
-
-echo ${PLATFORM}
+CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/ocp4/${CLUSTER_DIR}.git"
+SCRIPT_REPO="ssh://git@sdf.csin.cz:2222/ocp4/init-scripts.git"
+PLATFORM=$(yq read values.yaml 'platform')
 
 # Naklonujeme repository
 if [ ! -d "${CLUSTER_DIR}" ]; then
@@ -61,13 +64,13 @@ if ! git submodule status script &>/dev/null; then
   git submodule add -b master "${SCRIPT_REPO}" script
   git add .gitmodules script
   git commit -m "Add submodule scripts"
-else
-  git reset HEAD
-  git submodule update --remote script/
-  git add script
-  if ! git diff --cached --exit-code &>/dev/null; then
-    git commit -m "Updated submodule scripts"
-  fi
+#else
+#  git reset HEAD
+#  git submodule update --remote script/
+#  git add script
+#  if ! git diff --cached --exit-code &>/dev/null; then
+#    git commit -m "Updated submodule scripts"
+#  fi
 fi
 
 if [ ! -d values ]; then
@@ -90,19 +93,25 @@ fi
 [ -f "${SECRETS_FILE}" ] || cp "script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
 
 helm repo update
-helm template csas-helmcharts/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config
-if [ $? -ne 0 ]; then
-  echo "${RED}"
-  echo "Neexistujici verze helmchartu pro odpovidajici verzi OpenShiftu"
-  echo "Podporovane verze zjistite prikazem"
-  echo "  ${GREEN}$ helm search repo install-config -l${RED}"
-  echo "${NC}"
-  popd
-  rm -rf ${CLUSTER_DIR}
-  exit 1
+
+if [ ! -d install-config ]; then
+  helm template csas-helmcharts/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config
+  if [ $? -ne 0 ]; then
+    echo "${RED}"
+    echo "Neexistujici verze helmchartu pro odpovidajici verzi OpenShiftu"
+    echo "Podporovane verze zjistite prikazem"
+    echo "  ${GREEN}$ helm search repo install-config -l${RED}"
+    echo "${NC}"
+    popd
+    rm -rf ${CLUSTER_DIR}
+    exit 1
+  fi
+  mv install-config/install-config/templates/install-config.yaml install-config/
+  rm -rf install-config/install-config/ 
+else
+  echo "${RED}Nebudeme generovat konfiguracni soubor, jelikoz jiz byl v minulosti pripraven. Je pravdepodobne, ze cluster je jiz i nainstalovany, protoze k nemu existuji instalacni manifesty.${NC}"
+  echo "${RED}Zda manifesty existuji a nebo je k dispozici pouze zakladni konfiguracni soubor overite ve slozce ${CLUSTER_DIR}/install-config${NC}"
 fi
-mv install-config/install-config/templates/install-config.yaml install-config/
-rm -rf install-config/install-config/ 
 
 BASE_DOMAIN=$(yq read ../values.yaml baseDomain)
 CLUSTER_NAME=$(yq read ../values.yaml clusterName)
