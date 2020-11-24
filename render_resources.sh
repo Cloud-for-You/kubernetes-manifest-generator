@@ -17,6 +17,11 @@ done
 clean
 getComponents
 
+git reset HEAD
+git add values/ resources/
+git commit -a -m "ADD/Update values and resources from new version"
+git push master origin
+
 # Provedeme release do GITu
 while true; do
   read -p "${GREEN}Release resources to cluster?${NC} [y/n] " yn
