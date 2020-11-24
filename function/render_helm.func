@@ -3,6 +3,9 @@ render_helm() {
   local version="${2}"
   local repository="${3:-csas-helmcharts}"
 
+  # Overime zda mame values pro dany helmchart
+  [ -f values/${helmchart}.yaml ] || echo "${RED}Neexistuje soubor values/${helmchart}.yaml pro helmchart ${helmchart}${NC}"
+
   cat values/global.yaml values/${helmchart}.yaml | yq read -X - | yq read - ${helmchart} > tmp/${helmchart}.yaml
 
   local values_file="tmp/${helmchart}.yaml"
@@ -16,7 +19,14 @@ render_helm() {
     return;
   fi
 
-  # Provedeme render daneho deploymentu
+  # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
   helm template "${repository}/${helmchart}" -f ${values_file} --include-crds --output-dir tmp/render
+
+  if [ $? -eq 0 ]; then
+    rm -rf resources/${helmchart}
+    [ -d resources/${helmchart} ] || mkdir -p resources/${helmchart}
+    mv tmp/render/${helmchart}/templates/* resources/${helmchart}
+    rm -rf tmp/render/${helmchart}
+  fi
 
 }

@@ -1,6 +1,17 @@
 #!/bin/bash
 
-usage() { echo "Usage: $0 -n <CLUSTER NAME> -v <OPENSHIFT VERSION>" 1>&2; exit 1; }
+usage() {
+ # echo "Usage: $0 -n <CLUSTER NAME> -v <OPENSHIFT VERSION> [OPTIONS]" 1>&2; exit 1;
+
+cat << EOF
+Usage: $0 -n <CLUSTER NAME> -v <OPENSHIFT VERSION> [OPTIONS]
+
+Options:
+  --git
+EOF
+
+  exit 1
+}
 
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`

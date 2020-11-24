@@ -17,5 +17,20 @@ done
 clean
 getComponents
 
-#getComponentInfo cluster-config 0.1.0 kustomize
-
+# Provedeme release do GITu
+while true; do
+  read -p "${GREEN}Release resources to cluster?${NC} [y/n] " yn
+  case $yn in
+    [Yy]* )
+      echo "Releasujeme"
+      break
+      ;;
+    [Nn]* )
+      echo "Verze nebude nasazena na cluster"
+      exit 0
+      ;;
+    * )
+      echo "${RED}Please answer yes or no.${NC}"
+      ;;
+  esac
+done
