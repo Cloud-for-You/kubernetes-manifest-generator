@@ -20,7 +20,7 @@ getComponents
 git reset HEAD
 git add values/ resources/
 git commit -a -m "ADD/Update values and resources from new version"
-git push master origin
+git push -u origin master
 
 # Provedeme release do GITu
 while true; do
