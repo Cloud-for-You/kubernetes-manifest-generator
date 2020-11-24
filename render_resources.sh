@@ -6,6 +6,8 @@ NC=`tput sgr0`        # No Color
 
 ROOTDIR=$(pwd)
 
+helm repo update
+
 for function_file in `find $(dirname $0)/function/ -name *.func`; do
   . ${function_file}
 done
