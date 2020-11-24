@@ -1,12 +1,10 @@
 argocd-deployment-sys:
-  argocd-config:
-    cluster:
-      system_repo: *system-repo
-      app_repo: *app-repo
-    ingress: *ingress
-    git: *git
-#TODO vyhodit ze SYS Helm i Kutomize a presunout jinam
-    helm: *helm
-    kustomize: *kustomize
-    dex:
-      adminGroup: 'clusteradmins'
+  baseDomain: *baseDomain
+  clusterName: *clusterName
+  cluster:
+    system_repo: *system-repo
+    app_repo: *app-repo
+  git: *git
+  helm: *helm
+  dex:
+    adminGroup: 'clusteradmins'

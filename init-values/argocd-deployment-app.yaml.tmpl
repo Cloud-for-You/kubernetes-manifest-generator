@@ -1,8 +1,7 @@
 argocd-deployment-app:
-  argocd-config:
-    #  cluster: *cluster
-    ingress: *ingress
-    git: *git
-    helm: *helm
-    dex:
-      adminGroup: 'clusteradmins'
+  baseDomain: *baseDomain
+  clusterName: *clusterName
+  git: *git
+  helm: *helm
+  dex:
+    adminGroup: 'clusteradmins'
