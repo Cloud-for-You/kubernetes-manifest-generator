@@ -35,7 +35,7 @@ deploy_argosys() {
     while true; do
       read -p "Enter admin password: " PASSWD
       if [ -z ${PASSWD} ]; then
-        echo "Password is not set or null"
+        echo "Can't setup empty password"
       else
         break
       fi
@@ -45,8 +45,8 @@ deploy_argosys() {
     local PWDSTR='$2y$10$zzXhiHZm.xt7rBOOB3qDBuUFj6IMIzg7oxrY9ELFRwNPS0GV816dG'
     oc patch secret/argocd-secret -n ${NAMESPACE} -p="{ \"stringData\": { \"admin.password\": \"${PWDSTR}\", \"admin.passwordMtime\": \"${MTIMESTR}\" } }"
   else
-    echo "${RED}Password for admin user is set.${NC}"
-    echo "${RED}Manual setting is possible in secret/argocd-secret.${NC}"
+    echo "${RED}Password for admin user is set${NC}"
+    echo "${RED}Manual setting is possible in secret/argocd-secret${NC}"
   fi 
 
   # DEX Secret
@@ -62,6 +62,7 @@ deploy_argosys() {
 
   if [ ! -z ${DATA} ]; then
     echo "${RED}Git credentials is configure${NC}"
+    echo "${RED}Manual setting is possible in secret/repo-cs-argo${NC}"
   else
     while true; do
       read -p "${GREEN}Use Git credential is SSH keys or PASSWORD: ${NC} [ssh/password] " method
@@ -75,7 +76,7 @@ deploy_argosys() {
           break
           ;;
         * )
-          echo "${RED}Please answer ssh or password.${NC}"
+          echo "${RED}Please answer ssh or password${NC}"
           ;;
       esac
     done
