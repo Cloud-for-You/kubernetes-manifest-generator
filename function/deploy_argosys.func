@@ -1,0 +1,93 @@
+deploy_argosys() {
+  local RENDER_DIRECTORY=${1:-resources/argocd-deployment-sys}
+
+#  # Create CRDs for ArgoCD
+#  local CRDS_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -l "kind: CustomResourceDefinition")
+#  echo "${GREEN}Create CRDs for ArgoCD${NC}"
+#  for file in ${CRDS_FILES}; do
+#    oc create --save-config -f ${file} > /dev/null 2>&1
+#  done
+#
+  # Create Namespace for ArgoCD-SYS
+  local NAMESPACE_FILE=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -l "kind: Namespace")
+  local NAMESPACE=$(yq read ${NAMESPACE_FILE} 'metadata.name')
+  [ ! -z ${NAMESPACE} ] || local NAMESPACE=argocd-sys
+  echo "${GREEN}ArgoCD-SYS: Create namespace ${NAMESPACE}${NC}"
+  oc create --save-config -f ${NAMESPACE_FILE} > /dev/null 2>&1
+
+#  # Deploy ArgoCD-SYS
+#  local DEPLOY_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -v -l -e "kind: Namespace" -e "kind: CustomResourceDefinition")
+#  echo "${GREEN}ArgoCD-SYS: Deploy ArgoCD-SYS in namespace ${NAMESPACE}${NC}"
+#  for file in ${DEPLOY_FILES}; do
+#    oc create --save-config -n ${NAMESPACE} -f ${file} > /dev/null 2>&1
+#  done
+#
+#  for deployment in argocd-{server,application-controller,repo-server,dex-server,redis}; do
+#    oc rollout status -n ${NAMESPACE} deployment/${deployment} -w
+#  done
+#
+#  # Configure ArgoCD-SYS
+#  # Password
+#  # Is set password ?
+#  local PWDSTR=$(oc get secret/argocd-secret -n ${NAMESPACE} -o jsonpath="{.data.admin\.password}")
+#  if [ -z ${PWDSTR} ]; then
+#    echo "${RED}Setup admin password${NC}"
+#    while true; do
+#      read -p "Enter admin password: " PASSWD
+#      if [ -z ${PASSWD} ]; then
+#        echo "Password is not set or null"
+#      else
+#        break
+#      fi
+#    done
+#    # Zde musime heslo nastavit
+#    local MTIMESTR=$(TZ=GMT date +'%Y-%m-%dT%H:%M:%SZ')
+#    local PWDSTR='$2y$10$zzXhiHZm.xt7rBOOB3qDBuUFj6IMIzg7oxrY9ELFRwNPS0GV816dG'
+#    oc patch secret/argocd-secret -n ${NAMESPACE} -p="{ \"stringData\": { \"admin.password\": \"${PWDSTR}\", \"admin.passwordMtime\": \"${MTIMESTR}\" } }"
+#  else
+#    echo "${RED}Password for admin user is set.${NC}"
+#    echo "${RED}Manual setting is possible in secret/argocd-secret.${NC}"
+#  fi 
+#
+#  # DEX Secret
+#  local DEXSECRET=$(oc -n ${NAMESPACE} serviceaccounts get-token argocd-dex-server)
+#  if [ -z "${DEXSECRET}" ]; then
+#    echo "Can't setup empty dex secret" 
+#  else
+#    oc patch secret/argocd-secret -n ${NAMESPACE} -p="{ \"stringData\": { \"dex.openshift.secret\": \"${DEXSECRET}\" } }"
+#  fi
+
+  # GIT Secret
+  local DATA=$(oc get secret/repo-cs-argo -n ${NAMESPACE} -o jsonpath="{.data}")  
+
+  if [ ! -z ${DATA} ]; then
+    echo "${RED}Git credentials is configure${NC}"
+  else
+    while true; do
+      read -p "${GREEN}Use Git credential is SSH keys or PASSWORD: ${NC} [ssh/password] " method
+      case $method in
+        ssh)
+          setGitSSH ${NAMESPACE}
+          break
+          ;;
+        password)
+          setGitPassword ${NAMESPACE}
+          break
+          ;;
+        * )
+          echo "${RED}Please answer ssh or password.${NC}"
+          ;;
+      esac
+    done
+  fi
+  
+  
+
+
+
+
+
+#  for file in $(find ${RENDER_DIRECTORY} -type f); do
+#    echo ${file}
+#  done
+}
