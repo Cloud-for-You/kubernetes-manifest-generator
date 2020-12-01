@@ -46,7 +46,7 @@ deploy_argosys() {
     local PWDSTR='$2y$10$zzXhiHZm.xt7rBOOB3qDBuUFj6IMIzg7oxrY9ELFRwNPS0GV816dG'
     oc patch secret/argocd-secret -n ${NAMESPACE} -p="{ \"stringData\": { \"admin.password\": \"${PWDSTR}\", \"admin.passwordMtime\": \"${MTIMESTR}\" } }"
   else
-    echo "${RED}Password for admin user is set${NC}"
+    echo "${RED}iAdmin password is set${NC}"
     echo "${RED}Manual setting is possible in secret/argocd-secret${NC}"
   fi 
 
