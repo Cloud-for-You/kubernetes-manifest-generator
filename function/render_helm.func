@@ -25,7 +25,8 @@ render_helm() {
   if [ $? -eq 0 ]; then
     rm -rf resources/${helmchart}
     [ -d resources/${helmchart} ] || mkdir -p resources/${helmchart}
-    mv tmp/render/${helmchart}/templates/* resources/${helmchart}
+    [ ! -d tmp/render/${helmchart}/crds ] || mv tmp/render/${helmchart}/crds resources/${helmchart}
+    [ ! -d tmp/render/${helmchart}/templates ] || mv tmp/render/${helmchart}/templates resources/${helmchart}
     rm -rf tmp/render/${helmchart}
   fi
 
