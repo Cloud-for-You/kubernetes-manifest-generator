@@ -1,0 +1,6 @@
+bootstrap:
+  system_repo: *system-repo
+  system_repo_revision: release 
+  app_repo: *app-repo
+  app_repo_revision: master
+  app_repo_path: .
