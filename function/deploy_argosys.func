@@ -29,6 +29,7 @@ deploy_argosys() {
   # Configure ArgoCD-SYS
   # Password
   # Is set password ?
+  echo "Configure admin password"
   local PWDSTR=$(oc get secret/argocd-secret -n ${NAMESPACE} -o jsonpath="{.data.admin\.password}")
   if [ -z ${PWDSTR} ]; then
     echo "${RED}Setup admin password${NC}"
@@ -50,6 +51,7 @@ deploy_argosys() {
   fi 
 
   # DEX Secret
+  echo "Configure DEX secret"
   local DEXSECRET=$(oc -n ${NAMESPACE} serviceaccounts get-token argocd-dex-server)
   if [ -z "${DEXSECRET}" ]; then
     echo "Can't setup empty dex secret" 
@@ -58,6 +60,7 @@ deploy_argosys() {
   fi
 
   # GIT Secret
+  echo "Configure GIT credentials"
   local DATA=$(oc get secret/repo-cs-argo -n ${NAMESPACE} -o jsonpath="{.data}")  
 
   if [ ! -z ${DATA} ]; then
