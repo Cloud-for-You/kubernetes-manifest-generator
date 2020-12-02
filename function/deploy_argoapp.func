@@ -1,25 +1,18 @@
-deploy_argosys() {
-  echo "${GREEN}DEPLOY ARGOCD-SYS${NC}"
+deploy_argoapp() {
+  echo "${GREEN}DEPLOY ARGOCD-APP${NC}"
 
-  local RENDER_DIRECTORY=${1:-resources/argocd-deployment-sys}
+  local RENDER_DIRECTORY=${1:-resources/argocd-deployment-app}
 
-  # Create CRDs for ArgoCD
-  local CRDS_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -l "kind: CustomResourceDefinition")
-  echo "${GREEN}Create CRDs for ArgoCD${NC}"
-  for file in ${CRDS_FILES}; do
-    oc create --save-config -f ${file} > /dev/null 2>&1
-  done
-
-  # Create Namespace for ArgoCD-SYS
+  # Create Namespace for ArgoCD-APP
   local NAMESPACE_FILE=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -l "kind: Namespace")
   local NAMESPACE=$(yq read ${NAMESPACE_FILE} 'metadata.name')
-  [ ! -z ${NAMESPACE} ] || local NAMESPACE=argocd-sys
-  echo "${GREEN}ArgoCD-SYS: Create namespace ${NAMESPACE}${NC}"
+  [ ! -z ${NAMESPACE} ] || local NAMESPACE=argocd-app
+  echo "${GREEN}ArgoCD-APP: Create namespace ${NAMESPACE}${NC}"
   oc create --save-config -f ${NAMESPACE_FILE} > /dev/null 2>&1
 
-  # Deploy ArgoCD-SYS
+  # Deploy ArgoCD-APP
   local DEPLOY_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -v -l -e "kind: Namespace" -e "kind: CustomResourceDefinition")
-  echo "${GREEN}ArgoCD-SYS: Deploy ArgoCD-SYS in namespace ${NAMESPACE}${NC}"
+  echo "${GREEN}ArgoCD-APP: Deploy ArgoCD-APP in namespace ${NAMESPACE}${NC}"
   for file in ${DEPLOY_FILES}; do
     oc create --save-config -n ${NAMESPACE} -f ${file} > /dev/null 2>&1
   done
@@ -28,7 +21,7 @@ deploy_argosys() {
     oc rollout status -n ${NAMESPACE} deployment/${deployment} -w
   done
 
-  # Configure ArgoCD-SYS
+  # Configure ArgoCD-APP
   # Password
   # Is set password ?
   echo "Configure admin password"
