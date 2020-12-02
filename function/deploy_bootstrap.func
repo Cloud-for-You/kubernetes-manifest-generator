@@ -1,0 +1,3 @@
+deploy_bootstrap() {
+  echo oc create --save-config -n csas-argocd-sys -R -f resources/bootstrap/
+}
