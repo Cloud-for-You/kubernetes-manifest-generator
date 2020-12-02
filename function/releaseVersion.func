@@ -1,0 +1,3 @@
+releaseVersion() {
+  echo "Provedeme release v GITu pro nasazeni do clusteru master->release"
+}

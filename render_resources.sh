@@ -27,7 +27,7 @@ while true; do
   read -p "${GREEN}Release resources to cluster?${NC} [y/n] " yn
   case $yn in
     [Yy]* )
-      echo "Releasujeme"
+      releaseVersion
       break
       ;;
     [Nn]* )
