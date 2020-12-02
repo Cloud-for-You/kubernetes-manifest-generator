@@ -18,3 +18,4 @@ for function_file in `find $(dirname $0)/function/ -name *.func`; do
 done
 
 deploy_argosys
+deploy_argoapp
