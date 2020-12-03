@@ -7,6 +7,7 @@ render_helm() {
   if [ ! -f values/${name}.yaml ]; then
     echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${name}${NC}"
     echo "${RED}Vytvorte soubor values/${name}.yaml a renderovani opakujte${NC}"
+    clean
     exit 1
   fi
 
