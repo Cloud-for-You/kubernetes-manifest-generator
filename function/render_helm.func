@@ -4,7 +4,11 @@ render_helm() {
   local repository="${3:-csas-helmcharts}"
 
   # Overime zda mame values pro dany helmchart
-  [ -f values/${name}.yaml ] || echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${name}${NC}"
+  if [ ! -f values/${name}.yaml ]; then
+    echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${name}${NC}"
+    echo "${RED}Vytvorte soubor values/${name}.yaml a renderovani opakujte${NC}"
+    exit 1
+  fi
 
   cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
 
