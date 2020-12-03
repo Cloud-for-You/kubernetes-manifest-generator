@@ -1,6 +1,34 @@
 render_kustomize() {
-  local helmchart=${1}
-  local version=${2}
+  local name="${1}"
+  local version="${2}"
+  local repository="${3:-ocp-generic}"
 
-  echo "${GREEN}Render kustomize component: ${name} ${version} ${type}${NC}"
+#  echo "Render kustomize ${name} ${version}"
+#  echo "Artefact URL: https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip"
+
+  mkdir -p tmp/render/${name}/templates
+
+  cat <<EOF > "tmp/render/${name}/kustomization.yaml"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip 
+namespace: ${name}
+configMapGenerator:
+  - name: controller-manager
+    behavior: merge
+    literals:
+      - ARGOCD_NAMESPACE=csas-argocd-app
+EOF
+
+  kustomize build tmp/render/${name}/ -o tmp/render/${name}/templates
+
+  if [ $? -eq 0 ]; then
+    rm -rf resources/${name}
+    [ -d resources/${name} ] || mkdir -p resources/${name}
+    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds resources/${name}
+    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates resources/${name}
+    rm -rf tmp/render/${name}
+  fi
+
 }
