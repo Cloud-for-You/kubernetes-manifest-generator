@@ -1,3 +1,6 @@
 clean() {
-  rm -rf ${ROOTDIR}/resources/*
+  local dirs=$(find ${ROOTDIR}/resources/ -mindepth 1 -maxdepth 1 -type d -not -regex ".*/_custom")
+  for dir in ${dirs}; do
+    rm -rf ${dir}
+  done
 }
