@@ -140,6 +140,7 @@ if [ ${PLATFORM} == "none" ]; then
   echo "${RED}Vygenerujte ign soubory pro distribuci na COREOS pomoci TFTP${NC}"
 fi
 echo ""
+echo "${RED}Silne doporucujeme zazalohovat soubor ${CLUSTER_DIR}/install-config/install-config.yaml${NC}"
 echo "${RED}Spustte instalaci clusteru${NC}"
 echo "  ${GREEN}$ openshift-install create cluster --dir ${CLUSTER_DIR}/install-config/ --log-level debug${NC}"
 echo ""
