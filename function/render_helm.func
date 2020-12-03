@@ -1,33 +1,33 @@
 render_helm() {
-  local helmchart="${1}"
+  local name="${1}"
   local version="${2}"
   local repository="${3:-csas-helmcharts}"
 
   # Overime zda mame values pro dany helmchart
-  [ -f values/${helmchart}.yaml ] || echo "${RED}Neexistuje soubor values/${helmchart}.yaml pro helmchart ${helmchart}${NC}"
+  [ -f values/${name}.yaml ] || echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${name}${NC}"
 
-  cat values/global.yaml values/${helmchart}.yaml | yq read -X - | yq read - ${helmchart} > tmp/${helmchart}.yaml
+  cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
 
-  local values_file="tmp/${helmchart}.yaml"
+  local values_file="tmp/${name}.yaml"
 
   echo "${GREEN}Render helm component: ${name} ${version}${NC}"
   echo "Value files: ${values_file}"
 
   # Check search helmchart
-  if [ "$(helm search repo ${helmchart} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
-    echo "${RED}v repository neni Helmchart ${helmchart} ve verzi ${version} k dispozici${NC}"
+  if [ "$(helm search repo ${name} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
+    echo "${RED}v repository neni Helmchart ${name} ve verzi ${version} k dispozici${NC}"
     return;
   fi
 
   # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
-  helm template "${repository}/${helmchart}" -f ${values_file} --include-crds --output-dir tmp/render
+  helm template "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render
 
   if [ $? -eq 0 ]; then
-    rm -rf resources/${helmchart}
-    [ -d resources/${helmchart} ] || mkdir -p resources/${helmchart}
-    [ ! -d tmp/render/${helmchart}/crds ] || mv tmp/render/${helmchart}/crds resources/${helmchart}
-    [ ! -d tmp/render/${helmchart}/templates ] || mv tmp/render/${helmchart}/templates resources/${helmchart}
-    rm -rf tmp/render/${helmchart}
+    rm -rf resources/${name}
+    [ -d resources/${name} ] || mkdir -p resources/${name}
+    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds resources/${name}
+    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates resources/${name}
+    rm -rf tmp/render/${name}
   fi
 
 }
