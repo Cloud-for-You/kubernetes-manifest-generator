@@ -78,13 +78,14 @@ if [ ! -d values ]; then
   find ./script/init-values/ -type f -name "*.tmpl" -exec cp {} values/ \;
   rename -v '.tmpl' '' values/*.tmpl
 fi
-[ -d custom ] || cp -r script/init-custom/ custom
-[ -d .secrets ] || mkdir .secrets
+#[ -d custom ] || cp -r script/init-custom/ custom
+#[ -d .secrets ] || mkdir .secrets
 [ -f .gitignore ] || cp script/init/.gitignore ./
 [ -d tmp ] || mkdir tmp
 
 git reset HEAD
-git add values custom .gitignore
+#git add values custom .gitignore
+git add values .gitignore
 
 if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
