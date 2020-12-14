@@ -1,0 +1,13 @@
+render_bootstrap() {
+  local name="${1}"
+  local app_config="${2}"
+
+  if [ -z ${app_config} ]; then
+    echo "Render default config for ${name}"
+    echo "###################################"
+  else
+    echo "Render custom config for ${name}"
+    echo "${app_config}"
+  fi
+
+}

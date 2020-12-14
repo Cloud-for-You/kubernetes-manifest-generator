@@ -13,7 +13,7 @@ for function_file in `find $(dirname $0)/function/ -name *.func`; do
 done
 
 [ -d ${ROOTDIR}/resources ] || mkdir -p ${ROOTDIR}/resources
-[ -d ${ROOTDIR}/resources/_custom || mkdir -p ${ROOTDIR}/resources/_custom
+[ -d ${ROOTDIR}/resources/_custom ] || mkdir -p ${ROOTDIR}/resources/_custom
 
 clean
 getComponents
