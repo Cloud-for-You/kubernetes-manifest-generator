@@ -45,7 +45,7 @@ deploy_argosys() {
     done
     # Zde musime heslo nastavit
     local MTIMESTR=$(TZ=GMT date +'%Y-%m-%dT%H:%M:%SZ')
-    local PWDSTR='$2y$10$zzXhiHZm.xt7rBOOB3qDBuUFj6IMIzg7oxrY9ELFRwNPS0GV816dG'
+    local PWDSTR='$2y$10$dCcv1a55Q6tvXjAeM1OdDesIC6NuoeaXCmHrKhs4fKzNXzEWuX2p2'
     oc patch secret/argocd-secret -n ${NAMESPACE} -p="{ \"stringData\": { \"admin.password\": \"${PWDSTR}\", \"admin.passwordMtime\": \"${MTIMESTR}\" } }"
   else
     echo "${RED}Admin password is set${NC}"
