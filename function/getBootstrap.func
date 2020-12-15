@@ -1,7 +1,8 @@
-render_bootstrap() {
+getBootstrap() {
 
   local name="${1}"
   local appconfig="${2}"
+
   if [ -z "${appconfig}" ]; then
     echo "Render default config for ${name}"
     echo "###################################"

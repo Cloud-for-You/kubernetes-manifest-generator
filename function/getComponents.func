@@ -11,7 +11,7 @@ getComponents() {
 
 
       render_${type} "${name}" "${version}"
-      render_bootstrap "${name}" "${appconfig}"
+      getBootstrap "${name}" "${appconfig}"
     done
   done
 }
