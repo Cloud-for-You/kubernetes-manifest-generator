@@ -7,11 +7,11 @@ getComponents() {
 
       local name=$(yq read values/components.yaml "${component}[${i}].name")
       local version=$(yq read values/components.yaml "${component}[${i}].version")
-      local app_config=$(yq read values/components.yaml "${component}[${i}].app-config")
+      local appconfig=$(yq read values/components.yaml "${component}[${i}].appconfig")
 
 
       render_${type} "${name}" "${version}"
-      render_bootstrap "${name}" "${app_config}"
+      render_bootstrap "${name}" "${appconfig}"
     done
   done
 }

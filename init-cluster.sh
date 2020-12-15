@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 usage() {
  # echo "Usage: $0 -n <CLUSTER NAME> -v <OPENSHIFT VERSION> [OPTIONS]" 1>&2; exit 1;
@@ -75,8 +76,8 @@ fi
 
 if [ ! -d values ]; then
   mkdir values
-  find ./script/init-values/ -type f -name "*.tmpl" -exec cp {} values/ \;
-  rename -v '.tmpl' '' values/*.tmpl
+  find ./script/init-values/ -type f -name "*.tmpl" -exec cp {} ./values/ \;
+  rename -v 's/\.tmpl$//' values/*.tmpl
 fi
 #[ -d custom ] || cp -r script/init-custom/ custom
 #[ -d .secrets ] || mkdir .secrets
@@ -91,7 +92,14 @@ if ! git diff --cached --exit-code &>/dev/null; then
   git commit -m "Initial content"
 fi
 
-[ -f "${SECRETS_FILE}" ] || cp "script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
+if [ ! -f "${SECRETS_FILE}" ];then
+  if [ ! -d "$(dirname ${SECRETS_FILE})" ]; then 
+    mkdir "$(dirname ${SECRETS_FILE})"
+    cp "script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
+  else
+    cp "script/init-secrets/secrets.yaml" "${SECRETS_FILE}"
+  fi
+fi
 
 helm repo update
 
@@ -127,7 +135,7 @@ yq write -i values/global.yaml 'clusterName' ${CLUSTER_NAME} --anchorName cluste
 #yq delete -i ../values.yaml 'pullSecret'
 #yq delete -i ../values.yaml 'sshKey'
 
-rm -f ../values.yaml 
+rm -f ../values.yaml
 
 git reset HEAD
 git add install-config/ values/cluster-config.yaml values/global.yaml 
@@ -137,17 +145,19 @@ fi
 
 popd
 
+echo "${RED}--------------------------------------------${RED}"
 if [ ${PLATFORM} == "none" ]; then
   echo "${RED}Vygenerujte ign soubory pro distribuci na COREOS pomoci TFTP${NC}"
 fi
 echo ""
-echo "${RED}Silne doporucujeme zazalohovat soubor ${CLUSTER_DIR}/install-config/install-config.yaml${NC}"
-echo "${RED}Spustte instalaci clusteru${NC}"
+echo "Doporucujeme zazalohovat soubor ${RED}${CLUSTER_DIR}/install-config/install-config.yaml${NC}, pri instalaci clusteru bude automaticky smazan"
+echo "Spustte instalaci clusteru"
 echo "  ${GREEN}$ openshift-install create cluster --dir ${CLUSTER_DIR}/install-config/ --log-level debug${NC}"
 echo ""
-echo "${RED}Ostatni spusteni scriptu se musi provadet vzdy z adresare ${CLUSTER_DIR}${NC}"
-echo "${RED}Upravte soubory v adresari ${CLUSTER_DIR}/values a ${CLUSTER_DIR}/.secrets${NC}"
-echo "${RED}Adresar  ${CLUSTER_DIR}/.secrets se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto${NC}"
+echo "Ostatni spusteni scriptu se musi provadet vzdy z adresare ${RED}${CLUSTER_DIR}${NC}"
+echo "Upravte soubory v adresari ${RED}${CLUSTER_DIR}/values${NC}"
+echo "Upravte soubory v adresari ${RED}${CLUSTER_DIR}/${SECRETS_FILE}${NC}"
+echo "Adresar  ${RED}${CLUSTER_DIR}/.secrets${NC} se neuklada do GITu a je vhodne jej i zalohovat na bezpecne misto"
 echo ""
 echo "${RED}Vygenerujte sablony pro cluster spustenim${NC}"
 echo "  ${GREEN}$ bash script/render_resources.sh${NC}"
