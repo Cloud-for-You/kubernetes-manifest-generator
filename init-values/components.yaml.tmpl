@@ -2,9 +2,29 @@ ARGOCD:
   - name: argocd-deployment-sys
     version: v0.7.3
     type: helm 
+    appconfig:
+      spec:
+        destination:
+          namespace: csas-argocd-sys
+        syncPolicy:
+          syncOptions:
+          - CreateNamespace=false
+          automated:
+            prune: false
+            selfHeal: true
   - name: argocd-deployment-app
     version: v0.7.3
     type: helm
+    appconfig:
+      spec:
+        destination:
+          namespace: csas-argocd-app
+        syncPolicy:
+          syncOptions:
+          - CreateNamespace=false
+          automated:
+            prune: false
+            selfHeal: true
 CLUSTER_CONFIG:
   - name: cluster-config
     version: v0.1.0
