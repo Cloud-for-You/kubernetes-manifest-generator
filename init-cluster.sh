@@ -76,8 +76,8 @@ fi
 
 if [ ! -d values ]; then
   mkdir values
-  find ./script/init-values/ -type f -name "*.tmpl" -exec cp {} ./values/ \;
-  rename -v 's/\.tmpl$//' values/*.tmpl
+  find ./script/init-values/ -type f -name "*.tmpl" -exec cp {} values/ \;
+  rename -v '.tmpl' '' values/*.tmpl
 fi
 [ -f .gitignore ] || cp script/init/.gitignore ./
 [ -d tmp ] || mkdir tmp
