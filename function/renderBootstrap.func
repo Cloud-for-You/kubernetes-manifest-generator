@@ -1,16 +1,16 @@
 renderBootstrap() {
 
-  local name="bootstrap"
   local global_value_file="${ROOTDIR}/values/global.yaml"
   local git_repo=$(yq read -X ${global_value_file} 'system_repo')
-
   local argo_namespace=csas-argocd-sys
 
-  cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/resources/bootstrap/${name}.yaml
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.name' ${name}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.namespace' ${argo_namespace}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.path' resources/${name}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${name}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false" 
+  for name in bootstrap _custom; do
+    cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/resources/bootstrap/${name}.yaml
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.name' ${name}
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.namespace' ${argo_namespace}
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.path' resources/${name}
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${name}
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false" 
+  done
 }
