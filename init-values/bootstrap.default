@@ -1,23 +1,23 @@
 kind: Application
 metadata:
-  name: monitoring-operator
+  name: component-name 
   annotations:
     argocd.argoproj.io/sync-options: Prune=false
   namespace: csas-argocd-sys
 spec:
   project: default
   destination:
-    namespace: erynis-monitoring
+    namespace: dst-namespace 
     server: 'https://kubernetes.default.svc'
   source:
-    repoURL: 'ssh://git@sdf.csin.cz:2222/ocp4/ocp-deva-system.git'
+    repoURL: 
     targetRevision: 'master'
-    path: 'resources/monitoring-operator'
+    path: 'resources/component-name'
     directory:
       recurse: true
   syncPolicy:
     syncOptions:
-    - CreateNamespace=true
+    - CreateNamespace=false
     automated:
       prune: false
       selfHeal: true

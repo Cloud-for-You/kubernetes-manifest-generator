@@ -3,12 +3,22 @@ getBootstrap() {
   local name="${1}"
   local appconfig="${2}"
 
-  if [ -z "${appconfig}" ]; then
-    echo "Render default config for ${name}"
-    echo "###################################"
-  else
-    echo "Render custom config for ${name}"
-    echo "${appconfig}" > ${ROOTDIR}/resources/bootstrap/${name}.yaml
+  local global_value_file="${ROOTDIR}/values/global.yaml"
+  local git_repo=$(yq read -X ${global_value_file} 'system_repo')
+
+
+  local argo_namespace=csas-argocd-sys
+
+  cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/resources/bootstrap/${name}.yaml
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.name' ${name}
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.namespace' ${argo_namespace}
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.path' resources/${name}
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${name}
+
+  if [ ! -z "${appconfig}" ]; then
+    echo "${appconfig}" | yq merge -i --overwrite ${ROOTDIR}/resources/bootstrap/${name}.yaml -
+    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${name}
   fi
 
 }
