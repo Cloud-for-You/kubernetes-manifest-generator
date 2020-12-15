@@ -1,19 +1,19 @@
 ARGOCD:
   - name: argocd-deployment-sys
-    version: v0.7.3
-    type: helm 
+    version: v0.8.2
+    type: helm
     appconfig:
       spec:
         destination:
           namespace: csas-argocd-sys
         syncPolicy:
           syncOptions:
-          - CreateNamespace=false
+          - CreateNamespace=true
           automated:
             prune: false
             selfHeal: true
   - name: argocd-deployment-app
-    version: v0.7.3
+    version: v0.8.2
     type: helm
     appconfig:
       spec:
@@ -21,7 +21,7 @@ ARGOCD:
           namespace: csas-argocd-app
         syncPolicy:
           syncOptions:
-          - CreateNamespace=false
+          - CreateNamespace=true
           automated:
             prune: false
             selfHeal: true
@@ -36,10 +36,10 @@ CSAS_OPERATOR:
   - name: csas-application-operator
     version: 1.1.0-rc.11
     type: kustomize
-ELOS_MONITORING:
-  - name: monitoring-operator
-    version: 0.1.0
-    type: helm
-  - name: monitoring
-    version: 0.1.0
-    type: helm
+#ELOS_MONITORING:
+#  - name: monitoring-operator
+#    version: 0.1.0
+#    type: helm
+#  - name: monitoring
+#    version: 0.1.0
+#    type: helm
