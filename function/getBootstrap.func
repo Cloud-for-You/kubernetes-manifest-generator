@@ -18,7 +18,6 @@ getBootstrap() {
 
   if [ ! -z "${appconfig}" ]; then
     echo "${appconfig}" | yq merge -i --overwrite ${ROOTDIR}/resources/bootstrap/${name}.yaml -
-    yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${name}
   fi
 
 }
