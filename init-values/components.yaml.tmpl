@@ -6,12 +6,6 @@ ARGOCD:
       spec:
         destination:
           namespace: csas-argocd-sys
-        syncPolicy:
-          syncOptions:
-          - CreateNamespace=true
-          automated:
-            prune: false
-            selfHeal: true
   - name: argocd-deployment-app
     version: v0.8.2
     type: helm
@@ -19,16 +13,15 @@ ARGOCD:
       spec:
         destination:
           namespace: csas-argocd-app
-        syncPolicy:
-          syncOptions:
-          - CreateNamespace=true
-          automated:
-            prune: false
-            selfHeal: true
 CLUSTER_CONFIG:
   - name: cluster-config
     version: v0.1.0
     type: helm
+    appconfig:
+      spec:
+        syncPolicy:
+          syncOptions:
+          - CreateNamespace=false
 CSAS_OPERATOR:
   - name: csas-project-operator
     version: 1.0.0-rc.17
