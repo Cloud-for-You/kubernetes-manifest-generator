@@ -17,6 +17,7 @@ clean
 [ -d ${ROOTDIR}/resources/bootstrap ] || mkdir -p ${ROOTDIR}/resources/bootstrap
 
 getComponents
+renderBootstrap
 
 git reset HEAD
 git add values/ resources/
