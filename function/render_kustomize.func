@@ -8,17 +8,26 @@ render_kustomize() {
 
   mkdir -p tmp/render/${name}/templates
 
-  cat <<EOF > "tmp/render/${name}/kustomization.yaml"
+  local values_file="values/${name}.yaml"
+
+  local num=$(yq read "${values_file}" --length patches)
+  local i
+  for (( i=0; i < "${num}"; ++i )); do
+    yq read -X "${values_file}" patches.[${i}]
+    echo "---"
+  done > tmp/render/${name}/patches.yaml
+
+cat <<EOF > "tmp/render/${name}/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip 
 namespace: ${name}
+resources:
+- https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip
+patchesStrategicMerge:
+- patches.yaml
+${patches}
 configMapGenerator:
-  - name: controller-manager
-    behavior: merge
-    literals:
-      - ARGOCD_NAMESPACE=csas-argocd-app
+$(yq read -X "${values_file}" configMapGenerators)
 EOF
 
   kustomize build tmp/render/${name}/ -o tmp/render/${name}/templates
