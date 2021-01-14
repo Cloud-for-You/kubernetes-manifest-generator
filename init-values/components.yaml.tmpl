@@ -22,7 +22,7 @@ CLUSTER_CONFIG:
         syncPolicy:
           syncOptions:
           - CreateNamespace=false
-        destination
+        destination:
           namespace: csas-argocd-sys
 CSAS_OPERATOR:
   - name: csas-project-operator
