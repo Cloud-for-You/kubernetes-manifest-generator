@@ -132,7 +132,7 @@ yq write -i values/global.yaml 'clusterName' ${CLUSTER_NAME} --anchorName cluste
 #yq delete -i ../values.yaml 'pullSecret'
 #yq delete -i ../values.yaml 'sshKey'
 
-rm -f ../values.yaml
+#rm -f ../values.yaml
 
 git reset HEAD
 git add install-config/ values/cluster-config.yaml values/global.yaml 
