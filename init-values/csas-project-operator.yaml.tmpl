@@ -1,0 +1,24 @@
+memory: &memory 128Mi
+argons: &argons ARGOCD_NAMESPACE=csas-argocd-app
+
+##########
+patches:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: controller-manager
+    spec:
+      template:
+        spec:
+          containers:
+          - name: manager
+            resources:
+              limits:
+                memory: *memory
+              requests:
+                memory: *memory
+configMapGenerators:
+  - name: controller-manager
+    behavior: merge
+    literals:
+      - *argons
