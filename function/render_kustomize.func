@@ -3,12 +3,12 @@ render_kustomize() {
   local version="${2}"
   local repository="${3:-ocp-generic}"
 
-#  echo "Render kustomize ${name} ${version}"
-#  echo "Artefact URL: https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip"
-
   mkdir -p tmp/render/${name}/templates
 
   local values_file="values/${name}.yaml"
+
+  echo "${GREEN}Render kustomize component: ${name} ${version}${NC}"
+  echo "Value files: ${values_file}"
 
   local num=$(yq read "${values_file}" --length patches); num=${num:=0}
   local i
