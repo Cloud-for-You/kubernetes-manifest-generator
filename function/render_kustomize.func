@@ -10,7 +10,7 @@ render_kustomize() {
 
   local values_file="values/${name}.yaml"
 
-  local num=$(yq read "${values_file}" --length patches)
+  local num=$(yq read "${values_file}" --length patches); num=${num:=0}
   local i
   for (( i=0; i < "${num}"; ++i )); do
     yq read -X "${values_file}" patches.[${i}]
@@ -23,12 +23,16 @@ kind: Kustomization
 namespace: ${name}
 resources:
 - https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip
-patchesStrategicMerge:
-- patches.yaml
-${patches}
 configMapGenerator:
 $(yq read -X "${values_file}" configMapGenerators)
 EOF
+
+if [ "${num}" -gt 0 ]; then
+cat <<EOF >> "tmp/render/${name}/kustomization.yaml"
+patchesStrategicMerge:
+- patches.yaml
+EOF
+fi
 
   kustomize build tmp/render/${name}/ -o tmp/render/${name}/templates
 
