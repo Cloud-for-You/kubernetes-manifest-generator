@@ -21,10 +21,23 @@ clean
 getComponents
 renderBootstrap
 
-git reset HEAD
-git add values/ resources/
-git commit -a -m "ADD/Update values and resources from new version"
-#git push -u origin master
+# Provedeme GIT commit
+while true; do
+  read -p "${GREEN}Commit resources changes?${NC} [y/n] " yn
+  case $yn in
+    [Yy]* )
+      prepareVersion
+      break
+      ;;
+    [Nn]* )
+      echo "Commit nebyl proveden"
+      exit 0
+      ;;
+    * )
+      echo "${RED}Please answer yes or no.${NC}"
+      ;;
+  esac
+done
 
 # Provedeme release do GITu
 while true; do

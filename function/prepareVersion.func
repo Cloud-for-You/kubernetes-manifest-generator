@@ -1,0 +1,5 @@
+prepareVersion() {
+  git reset HEAD
+  git add values/ resources/
+  git commit -a -m "ADD/Update values and resources from new version"
+}
