@@ -26,7 +26,7 @@ render_helm() {
   fi
 
   # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
-  helm template "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render -n ${namespace}
+  helm template "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace}
 
   if [ $? -eq 0 ]; then
     rm -rf resources/${name}
