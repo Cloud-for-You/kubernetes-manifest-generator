@@ -1,7 +1,8 @@
 render_kustomize() {
   local name="${1}"
   local version="${2}"
-  local repository="${3:-ocp-generic}"
+  local namespace="${3:-${name}}"
+  local repository="${4:-ocp-generic}"
 
   mkdir -p tmp/render/${name}/templates
 
@@ -20,7 +21,7 @@ render_kustomize() {
 cat <<EOF > "tmp/render/${name}/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: ${name}
+namespace: ${namespace}
 resources:
 - https://artifactory.csin.cz/artifactory/${repository}/csas/${name}/${name}-${version}.zip
 configMapGenerator:

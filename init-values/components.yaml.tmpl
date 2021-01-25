@@ -2,28 +2,21 @@ ARGOCD:
   - name: argocd-deployment-sys
     version: v0.8.2
     type: helm
-    appconfig:
-      spec:
-        destination:
           namespace: csas-argocd-sys
   - name: argocd-deployment-app
     version: v0.8.2
     type: helm
-    appconfig:
-      spec:
-        destination:
           namespace: csas-argocd-app
 CLUSTER_CONFIG:
   - name: cluster-config
     version: v0.1.1
     type: helm
+    namespace: csas-argocd-sys
     appconfig:
       spec:
         syncPolicy:
           syncOptions:
           - CreateNamespace=false
-        destination:
-          namespace: csas-argocd-sys
 CSAS_OPERATOR:
   - name: csas-project-operator
     version: 1.0.0-rc.17
@@ -35,14 +28,8 @@ ELOS_MONITORING:
   - name: monitoring-operator
     version: 0.1.0
     type: helm
-    appconfig:
-      spec:
-        destination:
           namespace: csas-monitoring
   - name: monitoring
     version: 0.1.0
     type: helm
-    appconfig:
-      spec:
-        destination:
           namespace: csas-monitoring

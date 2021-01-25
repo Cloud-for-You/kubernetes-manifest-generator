@@ -1,7 +1,8 @@
 render_helm() {
   local name="${1}"
   local version="${2}"
-  local repository="${3:-csas-helmcharts}"
+  local namespace="${3:-${name}}"
+  local repository="${4:-csas-helmcharts}"
 
   # Overime zda mame values pro dany helmchart
   if [ ! -f values/${name}.yaml ]; then
@@ -25,7 +26,7 @@ render_helm() {
   fi
 
   # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
-  helm template "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render
+  helm template "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render -n ${namespace}
 
   if [ $? -eq 0 ]; then
     rm -rf resources/${name}
