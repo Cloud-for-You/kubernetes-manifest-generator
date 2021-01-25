@@ -20,9 +20,9 @@ render_helm() {
   echo "Value files: ${values_file}"
 
   # Check search helmchart
-  if [ "$(helm search repo ${name} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
+  if [ "$(helm search repo ${repository}/${name} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
     echo "${RED}v repository neni Helmchart ${name} ve verzi ${version} k dispozici${NC}"
-    return;
+    return 1;
   fi
 
   # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
