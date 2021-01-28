@@ -19,8 +19,15 @@ patches:
               requests:
                 memory: *memory
           priorityClassName: *prioclass
+  - apiVersion: ops.csas.cz/v1
+    kind: ProjectOperatorConfig
+    metadata:
+      name: csas-project-operator-controller-manager
+    spec:
+      <<: *workload
 configMapGenerators:
   - name: controller-manager
     behavior: merge
     literals:
       - *argons
+      - *envtypes

@@ -16,11 +16,9 @@ kustomize: &kustomize
   url: https://artifactory.csin.cz/artifactory/ocp-generic/
 
 workload: &workload
-  environmentTypes:
-    - dev
-    - test
   applicationSource: https://github.com/cs-poc/{}-apps.git
   sourceRepos:
     - git@github.com:cs-poc/{}-*.git
     - https://github.com/cs-poc/{}-*.git
     - https://artifactory.csas.elostech.cz/artifactory/{}-helm
+environmentTypes: &envtypes OPERATOR_ENVIRONMENT_TYPES=dev,test
