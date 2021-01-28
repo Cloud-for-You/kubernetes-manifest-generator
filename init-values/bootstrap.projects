@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+  name: projects
+  namespace: csas-argocd-sys
+spec:
+  destination:
+    namespace: csas-argocd-sys
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    directory:
+      jsonnet: {}
+      recurse: true
+    path: .
+    repoURL:
+    targetRevision: master
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true

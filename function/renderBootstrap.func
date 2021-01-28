@@ -14,30 +14,10 @@ renderBootstrap() {
     yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false" 
   done
 
-cat <<EOF > "${ROOTDIR}/resources/bootstrap/projects.yaml"
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  annotations:
-    argocd.argoproj.io/sync-options: Prune=false
-  name: projects
-  namespace: csas-argocd-sys
-spec:
-  destination:
-    namespace: csas-argocd-sys
-    server: 'https://kubernetes.default.svc'
-  project: default
-  source:
-    directory:
-      jsonnet: {}
-      recurse: true
-    path: .
-    repoURL: 'ssh://git@sdf.csin.cz:2222/ocp4/ocp-oaz-deva-project.git'
-    targetRevision: master
-  syncPolicy:
-    automated:
-      prune: false
-      selfHeal: true
-EOF
+  {
+    local workload_repo=$(yq read -X ${global_value_file} 'app_repo')
+    cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/resources/bootstrap/projects.yaml
+    yq write -i ${ROOTDIR}/resources/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
+  }
 
 }
