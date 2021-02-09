@@ -1,5 +1,5 @@
 clean() {
-  local dirs=$(find ${ROOTDIR}/resources/ -mindepth 1 -maxdepth 1 -type d -not -regex ".*/_custom")
+  local dirs=$(find ${ROOTDIR}/resources/ -mindepth 1 -maxdepth 1 -type d -not -regex ".*/custom-resources")
 
   rm -rf ${ROOTDIR}/tmp/*
   for dir in ${dirs}; do
