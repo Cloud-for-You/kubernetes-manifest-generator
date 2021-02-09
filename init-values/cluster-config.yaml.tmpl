@@ -3,11 +3,16 @@ cluster-config:
   clusterName: *clusterName
 
   auth:
-    AAD:
+    AzureActiveDirectory:
+      tenantID: <ID> 
+      clientID: <ID> 
+      clientSecret: <SECRET>
+  groupSync:
+    AzureActiveDirectory:
       tenantID: <ID>
       clientID: <ID>
       clientSecret: <SECRET>
-  
+
   certs:
     api:
       crt: |
