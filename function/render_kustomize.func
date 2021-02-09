@@ -2,7 +2,7 @@ render_kustomize() {
   local name="${1}"
   local version="${2}"
   local namespace="${3:-${name}}"
-  local repository="${4:-ocp-generic}"
+  local repository="${4:-csas-openshift-generic-local}"
 
   mkdir -p tmp/render/${name}/templates
 
