@@ -101,7 +101,7 @@ fi
 helm repo update
 
 if [ ! -d install-config ]; then
-  helm template csas-openshift-helm-local/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config
+  helm template csas-openshift-helm/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config
   if [ $? -ne 0 ]; then
     echo "${RED}"
     echo "Neexistujici verze helmchartu pro odpovidajici verzi OpenShiftu"
