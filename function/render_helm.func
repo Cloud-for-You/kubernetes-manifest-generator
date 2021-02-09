@@ -2,7 +2,7 @@ render_helm() {
   local name="${1}"
   local version="${2}"
   local namespace="${3:-${name}}"
-  local repository="${4:-csas-helmcharts}"
+  local repository="${4:-csas-openshift-helm-local}"
 
   # Overime zda mame values pro dany helmchart
   if [ ! -f values/${name}.yaml ]; then

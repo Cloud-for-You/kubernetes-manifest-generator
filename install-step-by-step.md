@@ -22,16 +22,16 @@ repositories:
   certFile: ""
   insecure_skip_tls_verify: false
   keyFile: ""
-  name: csas-helmcharts
+  name: csas-openshift-helm-local 
   password: **supertajneheslo**
-  url: https://artifactory.csin.cz/artifactory/csas-helmcharts/
+  url: https://artifactory.csin.cz/artifactory/csas-openshift-helm-local/
   username: ocp
 EOF
 
 # helm repo test
 helm repo update
 helm repo search 
-helm search repo csas-helmcharts
+helm search repo csas-openshift-helm-local 
 ```
 
 ### SSH
