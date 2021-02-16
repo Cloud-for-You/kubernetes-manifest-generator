@@ -42,10 +42,11 @@ CSAS_OPERATOR:
           automated:
             prune: false
             selfHeal: true
-ELOS_MONITORING:
+MONITORING:
   - name: monitoring-operator
     version: 0.1.0
     type: helm
+    vendor: elostech
     namespace: csas-monitoring
     appconfig:
       spec:
@@ -56,6 +57,7 @@ ELOS_MONITORING:
   - name: monitoring
     version: 0.1.0
     type: helm
+    vendor: elostech
     namespace: csas-monitoring
     appconfig:
       spec:
@@ -63,3 +65,12 @@ ELOS_MONITORING:
           automated:
             prune: false
             selfHeal: true
+  - name: dynatrace-oneagent-operator
+    vendor: dynatrace
+    version: v0.9.5 
+    type: helm
+    namespace: dynatrace
+    appconfig:
+      spec:
+        destination:
+          namespace: dynatrace
