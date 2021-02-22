@@ -6,7 +6,8 @@ render_kustomize() {
 
   mkdir -p tmp/render/${name}/templates
 
-  local values_file="values/${name}.yaml"
+  cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
+  local values_file="tmp/${name}.yaml"
 
   echo "${GREEN}Render kustomize component: ${name} ${version}${NC}"
   echo "Value files: ${values_file}"

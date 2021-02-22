@@ -3,31 +3,32 @@ argons: &argons ARGOCD_NAMESPACE=csas-argocd-app
 prioclass: &prioclass argocd-deployment
 
 ##########
-patches:
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: controller-manager
-    spec:
-      template:
-        spec:
-          containers:
-          - name: manager
-            resources:
-              limits:
-                memory: *memory
-              requests:
-                memory: *memory
-          priorityClassName: *prioclass
-  - apiVersion: ops.csas.cz/v1
-    kind: ProjectOperatorConfig
-    metadata:
-      name: csas-project-operator-controller-manager
-    spec:
-      <<: *workload
-configMapGenerators:
-  - name: controller-manager
-    behavior: merge
-    literals:
-      - *argons
-      - *envtypes
+csas-project-operator:
+  patches:
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: controller-manager
+      spec:
+        template:
+          spec:
+            containers:
+            - name: manager
+              resources:
+                limits:
+                  memory: *memory
+                requests:
+                  memory: *memory
+            priorityClassName: *prioclass
+    - apiVersion: ops.csas.cz/v1
+      kind: ProjectOperatorConfig
+      metadata:
+        name: csas-project-operator-controller-manager
+      spec:
+        <<: *workload
+  configMapGenerators:
+    - name: controller-manager
+      behavior: merge
+      literals:
+        - *argons
+        - *envtypes
