@@ -15,6 +15,9 @@ getBootstrap() {
   yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
   yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.path' resources/${name}
   yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${namespace}
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.automated.prune' false
+  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.automated.selfHeal' true
+  
 
   if [ ! -z "${appconfig}" ]; then
     echo "${appconfig}" | yq merge -i --overwrite ${ROOTDIR}/resources/bootstrap/${name}.yaml -
