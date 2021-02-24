@@ -15,7 +15,7 @@ deploy_argosys() {
   local NAMESPACE=$(yq read ${NAMESPACE_FILE} 'metadata.name' > /dev/null 2>&1 || echo -n "csas-argocd-sys")
   [ ! -z ${NAMESPACE} ] || local NAMESPACE=argocd-sys
   echo "${GREEN}ArgoCD-SYS: Create namespace ${NAMESPACE}${NC}"
-  oc create --save-config -f ${NAMESPACE_FILE} > /dev/null 2>&1
+  oc adm new-project ${NAMESPACE} > /dev/null 2>&1
 
   # Deploy ArgoCD-SYS
   local DEPLOY_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -v -l -e "kind: Namespace" -e "kind: CustomResourceDefinition")
