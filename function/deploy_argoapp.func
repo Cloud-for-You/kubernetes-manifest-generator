@@ -8,8 +8,8 @@ deploy_argoapp() {
   local NAMESPACE=$(yq read ${NAMESPACE_FILE} 'metadata.name' > /dev/null 2>&1 || echo -n "csas-argocd-app")
   [ ! -z ${NAMESPACE} ] || local NAMESPACE=argocd-app
   echo "${GREEN}ArgoCD-APP: Create namespace ${NAMESPACE}${NC}"
-  oc create --save-config -f ${NAMESPACE_FILE} > /dev/null 2>&1
-
+  oc adm new-project ${NAMESPACE} > /dev/null 2>&1
+  
   # Deploy ArgoCD-APP
   local DEPLOY_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -v -l -e "kind: Namespace" -e "kind: CustomResourceDefinition")
   echo "${GREEN}ArgoCD-APP: Deploy ArgoCD-APP in namespace ${NAMESPACE}${NC}"
