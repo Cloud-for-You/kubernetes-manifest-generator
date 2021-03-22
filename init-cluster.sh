@@ -43,7 +43,8 @@ if [ ! -f values.yaml ]; then
 fi
 
 CLUSTER_DIR="ocp-${CLUSTER_NAME}-system"
-SECRETS_FILE=".secrets/ocp-${CLUSTER_NAME}-secrets.yaml"
+#SECRETS_FILE=".secrets/ocp-${CLUSTER_NAME}-secrets.yaml"
+SECRETS_FILE=".secrets/secrets.yaml"
 CLUSTER_REPO="ssh://git@sdf.csin.cz:2222/ocp4/${CLUSTER_DIR}.git"
 SCRIPT_REPO="ssh://git@sdf.csin.cz:2222/ocp4/init-scripts.git"
 PLATFORM=$(yq read values.yaml 'platform')
