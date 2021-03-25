@@ -22,3 +22,42 @@ workload: &workload
     - https://github.com/cs-poc/{}-*.git
     - https://artifactory.csas.elostech.cz/artifactory/{}-helm
 environmentTypes: &envtypes OPERATOR_ENVIRONMENT_TYPES=dev,test
+
+proxy: &proxy
+  http_proxy: "http://ngproxy.csin.cz:8080/"
+  https_proxy: "http://ngproxy.csin.cz:8080/"
+  no_proxy: ".cluster.local,.csin.cz,.svc,localhost"
+
+rootcacert: &rootcacert |
+  -----BEGIN CERTIFICATE-----
+  MIIFhDCCA2ygAwIBAgICAbswDQYJKoZIhvcNAQENBQAwVjELMAkGA1UEBhMCQ1ox
+  ITAfBgNVBAoMGMSMZXNrw6Egc3BvxZlpdGVsbmEgYS5zLjEUMBIGA1UECwwLU3By
+  w6F2YSBQS0kxDjAMBgNVBAMTBUNBSVIzMB4XDTE0MTIyNjE0MDA0MloXDTMxMDQw
+  MTEzMDAwOFowVjELMAkGA1UEBhMCQ1oxITAfBgNVBAoMGMSMZXNrw6Egc3BvxZlp
+  dGVsbmEgYS5zLjEUMBIGA1UECwwLU3Byw6F2YSBQS0kxDjAMBgNVBAMTBUNBSVIz
+  MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA1kYzcgWNa4YadHy0ucT4
+  9+vKB22voguPtwrJ3rdOUp6got4aDWlwBuWo12c0HH06RM/41kDv6krLNjLK2jZa
+  HGXnQCpWwMe3MvquPkHCnRUyaG3KsNoxyP7darE45hERvNZwN6lk4E9z8ROlkdhe
+  i+VEj/uuTg9H68UO5//z4JcoIpvZgwNAqx9Sne+gJku+KzZ2ON3ymGxH+Xg+kzkz
+  nOjpge4KDXQiSFPia0WIDb50mZBhkHQ1qtYb0QLnZMMpAp2SjBLehUxZqUuccXcL
+  AIEy5IKpAvbA9rOnjCtixPnpsjtVYPkMaGqQaiaxhnGgsSx5W5UqD7WmtNNFY3kt
+  nhQOegN4joHgBtJWA5888EnkdkXGZNp1NddlhDkjg5bRx6F8mWIX31xucezAtGsu
+  yntiVyJxJTE43sG1OsCW9AszTB4fZHL0+berM+iwtZuAIIDU+VubQ4odJPUnOIq8
+  whFIP4EWmNumwEvhkw8msouryyZ4Gn5DkfylwKJiNbzVvkEddXlNTTy4VJ2IzXZj
+  /TSzgtFTAapZNQ875D63KAyinz9XyOWqaY8u7CghIVXTHtp/M5wa5cS9ERk8RCFN
+  OrCuoh+yC8bMsneWXSvFbbQrQU6s9WqSEZcjWxPQIekAVygKXMZdfUebt+CX9Ogf
+  EL2+gFmCKXdxOA5zsHZBZDcCAwEAAaNcMFowDwYDVR0TBAgwBgEB/wIBATAYBgNV
+  HSAEETAPMA0GCyuBGpXJwm6rZwADMA4GA1UdDwEB/wQEAwIBxjAdBgNVHQ4EFgQU
+  /7u+mUWuS76xAYAOneNL++MxOYowDQYJKoZIhvcNAQENBQADggIBACOFjrU/EraN
+  bTLQFO3tB5Lcq0eTsoa0ljcXug4gWI2vedQKuBYgVQl9s45jSl4sKXEZ1wNnm5fi
+  JT3SOI/eUXAJ2+U33aFWTR8Lp8QZmsKUned7KXVGCeA5DdYyqIqCdkKWuS+VGoWF
+  RZAHy3ezfGDmjphYZYtlanWYhd4jDBKR6rV0PV92GAjf9afR/47REx7uLn2shcoo
+  UOnXk+yLsWS1YKR/FoUXKR/xKWTkIHWoWXKkiQYfwas0ACDLp/cJS00Ln6q5i6/a
+  xMXeytrXF7G47GLJBl32a0ZjFjRa0CXHD0XBrFFZ9sXEpWUf2BVCXg1qEn5sLwd4
+  w9aA9LXBtBs0VoMw7T1uIM019Ooz2wSm6oAO4ukOubQA+axuFZ1uKea2Yyhi3Ofw
+  qbaY7QPuOiFuKfGMqUGlKj0fsmc6A1+wBuI5snDXa7I8IYvXkG5+gj/6zLJn4mV5
+  WyZZ5LdS29yNhFp6SZZe9X7rrbk4lxyO3mIEV2XVE4waAfCxgfnB6nwSIVFAKQ1X
+  9G8X4UrzO2FDE95NhMcU5EtcetYmbgfXS4E4bQYmbQK8PegtmnVSU5P1mh75jmhq
+  496XdRcsjK5BKRn7L8fcOg0QXitvJM7gFDUyHsH4aM0JMmOiUHV3Rdr3aq4eYHA4
+  usYhjOnnooDj+5oPonZkjBWU05W6A1T5
+  -----END CERTIFICATE-----

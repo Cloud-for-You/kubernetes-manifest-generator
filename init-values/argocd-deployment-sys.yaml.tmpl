@@ -8,3 +8,7 @@ argocd-deployment-sys:
   helm: *helm
   dex:
     adminGroup: 'clusteradmins'
+  proxy: *proxy
+  certs:
+  - host: artifactory.csin.cz
+    cert: *rootcacert
