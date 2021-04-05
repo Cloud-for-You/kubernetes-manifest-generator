@@ -1,26 +1,25 @@
 ARGOCD:
   - name: argocd-deployment-sys
-    version: v0.8.2
+    version: v1.0.9
     type: helm
     namespace: csas-argocd-sys
+    appconfig:
+      spec:
+        syncPolicy:
+          automated: null
   - name: argocd-deployment-app
-    version: v0.8.2
+    version: v1.0.9
     type: helm
     namespace: csas-argocd-app
-    appconfig:
-      spec:
-        syncPolicy:
-          automated:
-            prune: false
-            selfHeal: true
 CLUSTER_CONFIG:
   - name: cluster-config
-    version: v0.1.2
+    version: v0.1.4
     type: helm
     namespace: csas-argocd-sys
     appconfig:
       spec:
         syncPolicy:
+          automated: null
           syncOptions:
           - CreateNamespace=false
 CUSTOM:
@@ -34,46 +33,22 @@ CUSTOM:
           - CreateNamespace=false
 CSAS_OPERATOR:
   - name: csas-project-operator
-    version: 1.0.0-rc.17
+    version: 1.0.6
     type: kustomize
-    appconfig:
-      spec:
-        syncPolicy:
-          automated:
-            prune: false
-            selfHeal: true
   - name: csas-application-operator
-    version: 1.1.0-rc.11
+    version: 1.2.6
     type: kustomize
-    appconfig:
-      spec:
-        syncPolicy:
-          automated:
-            prune: false
-            selfHeal: true
 MONITORING:
   - name: monitoring-operator
     version: 0.1.0
     type: helm
     vendor: elostech
     namespace: csas-monitoring
-    appconfig:
-      spec:
-        syncPolicy:
-          automated:
-            prune: false
-            selfHeal: true
   - name: monitoring
     version: 0.1.0
     type: helm
     vendor: elostech
     namespace: csas-monitoring
-    appconfig:
-      spec:
-        syncPolicy:
-          automated:
-            prune: false
-            selfHeal: true
   - name: dynatrace-oneagent-operator
     vendor: dynatrace
     version: v0.9.5 
@@ -81,5 +56,14 @@ MONITORING:
     namespace: dynatrace
     appconfig:
       spec:
-        destination:
-          namespace: dynatrace
+        ignoreDifferences:
+          - kind: ServiceAccount
+            name: dynatrace-oneagent-operator
+            namespace: dynatrace
+            jsonPointers:
+              - /imagePullSecrets
+          - kind: ServiceAccount
+            name: dynatrace-oneagent
+            namespace: dynatrace
+            jsonPointers:
+              - /imagePullSecrets
