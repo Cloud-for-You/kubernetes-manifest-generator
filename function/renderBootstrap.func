@@ -8,7 +8,6 @@ renderBootstrap() {
   cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/resources/bootstrap/${name}.yaml
   getBootstrap "${name}" "" "${argo_namespace}"
   yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false"
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.automated' 'null'
 
   local workload_repo=$(yq read -X ${global_value_file} 'app_repo')
   cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/resources/bootstrap/projects.yaml
