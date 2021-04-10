@@ -25,8 +25,14 @@ render_helm() {
     return 1;
   fi
 
+  local postrenderer=""
+  if [ -f "postrender/${name}" ]; then
+    echo "${GREEN}Nastavuji post-renderer postrender/${name}${NC}"
+    postrenderer="--post-renderer postrender/${name}"
+  fi
+
   # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
-  helm template ${name} "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace}
+  helm template ${name} "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace} ${postrenderer}
 
   if [ $? -eq 0 ]; then
     rm -rf resources/${name}
