@@ -13,3 +13,4 @@ Vytvořené Helm repository je nakonec potřeba nastavit:
 
 ## Nastavení verze Helm chartu
 V konfiguraci komponenty v souboru `values/components.yaml` je potřeba nastavit správnou verzi (podle souboru v adresáři `<DIR>`) a dále je potřeba nastavit: `repository: <REPONAME>`
+Upozornění: nepoužívejte `build metadata` komponentu k rozlišení jednotlivých buildů. Helm při hledání verze totiž tuto komponentu ignoruje a vrací náhodně vybranou verzi se shodným zbytkem označení verze.
