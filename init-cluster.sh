@@ -17,6 +17,7 @@ EOF
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
 NC=`tput sgr0`        # No Color
+HELMCHART_REPOS=csas-openshift-helm
 
 while getopts ":n:v:" opts; do
   case "${opts}" in
@@ -102,7 +103,7 @@ fi
 helm repo update
 
 if [ ! -d install-config ]; then
-  helm template csas-openshift-helm/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config
+  helm template ${HELMCHART_REPOS}/install-config --values ../values.yaml --version ${OPENSHIFT_VERSION} --output-dir install-config
   if [ $? -ne 0 ]; then
     echo "${RED}"
     echo "Neexistujici verze helmchartu pro odpovidajici verzi OpenShiftu"
