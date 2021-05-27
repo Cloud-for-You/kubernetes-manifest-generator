@@ -1,3 +1,8 @@
 monitoring:
   baseDomain: *baseDomain
   clusterName: *clusterName
+
+  nodeSelector: *nodeSelector
+
+  monitoring-operator:
+    nodeSelector: *nodeSelector
