@@ -1,6 +1,5 @@
 memory: &memory 128Mi
 argons: &argons ARGOCD_NAMESPACE=csas-argocd-app
-prioclass: &prioclass argocd-deployment
 
 ##########
 csas-project-operator:
@@ -19,7 +18,7 @@ csas-project-operator:
                   memory: *memory
                 requests:
                   memory: *memory
-            priorityClassName: *prioclass
+            priorityClassName: *priorityClass
     - apiVersion: ops.csas.cz/v1
       kind: ProjectOperatorConfig
       metadata:

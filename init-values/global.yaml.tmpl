@@ -1,7 +1,10 @@
 baseDomain: &baseDomain
 clusterName: &clusterName
+priorityClass: &priorityClass argocd-deployment
 
 nodeSelector: &nodeSelector worker
+nodeSelectorFull: &nodeSelectorFull
+  node-role.kubernetes.io/worker: ""
 
 system_repo: &system-repo
 app_repo: &app-repo
