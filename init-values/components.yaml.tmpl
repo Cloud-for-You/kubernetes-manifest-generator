@@ -62,3 +62,9 @@ MONITORING:
             namespace: dynatrace
             jsonPointers:
               - /imagePullSecrets
+SEALED_SECRETS:
+  - name: sealed-secrets-controller
+    artefact: sealed-secrets
+    version: 0.3.0
+    type: helm
+    namespace: csas-sealed-secrets
