@@ -3,10 +3,11 @@ render_helm() {
   local version="${2}"
   local namespace="${3:-${name}}"
   local repository="${4:-csas-openshift-helm}"
+  local helmchart="${5:-${name}}"
 
   # Overime zda mame values pro dany helmchart
   if [ ! -f values/${name}.yaml ]; then
-    echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${name}${NC}"
+    echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${helmchart}${NC}"
     echo "${RED}Vytvorte soubor values/${name}.yaml a renderovani opakujte${NC}"
     clean
     exit 1
@@ -20,8 +21,8 @@ render_helm() {
   echo "Value files: ${values_file}"
 
   # Check search helmchart
-  if [ "$(helm search repo ${repository}/${name} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
-    echo "${RED}v repository neni Helmchart ${name} ve verzi ${version} k dispozici${NC}"
+  if [ "$(helm search repo ${repository}/${helmchart} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
+    echo "${RED}v repository neni Helmchart ${helmchart} ve verzi ${version} k dispozici${NC}"
     return 1;
   fi
 
@@ -32,15 +33,15 @@ render_helm() {
   fi
 
   # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
-  helm template ${name} "${repository}/${name}" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace} ${postrenderer}
+  helm template ${name} "${repository}/${helmchart}" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace} ${postrenderer}
 
   if [ $? -eq 0 ]; then
     rm -rf resources/${name}
     [ -d resources/${name} ] || mkdir -p resources/${name}
-    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds resources/${name}
-    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates resources/${name}
-    [ ! -d tmp/render/${name}/charts ] || mv tmp/render/${name}/charts resources/${name}
-    rm -rf tmp/render/${name}
+    [ ! -d tmp/render/${helmchart}/crds ]      || mv tmp/render/${helmchart}/crds      resources/${name}
+    [ ! -d tmp/render/${helmchart}/templates ] || mv tmp/render/${helmchart}/templates resources/${name}
+    [ ! -d tmp/render/${helmchart}/charts ]    || mv tmp/render/${helmchart}/charts    resources/${name}
+    rm -rf tmp/render/${helmchart}
   fi
 
 }

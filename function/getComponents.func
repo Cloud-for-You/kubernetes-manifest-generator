@@ -10,8 +10,9 @@ getComponents() {
       local appconfig=$(yq read values/components.yaml "${component}[${i}].appconfig")
       local namespace=$(yq read values/components.yaml "${component}[${i}].namespace")
       local repository=$(yq read values/components.yaml "${component}[${i}].repository")
+      local artefact=$(yq read values/components.yaml "${component}[${i}].artefact")
 
-      render_${type} "${name}" "${version}" "${namespace}" "${repository}"
+      render_${type} "${name}" "${version}" "${namespace}" "${repository}" "${artefact}"
       getBootstrap "${name}" "${appconfig}" "${namespace}"
     done
   done
