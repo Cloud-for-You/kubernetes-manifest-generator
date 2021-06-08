@@ -1,16 +1,13 @@
 #!/bin/bash
 
 usage() {
- echo "Usage: $0 -n <NAMESPACE> -p <PASSWORD>" 1>&2; exit 1;
+ echo "Usage: $0 -n <NAMESPACE>" 1>&2; exit 1;
 }
 
-while getopts ":n:p:" opts; do
+while getopts ":n:" opts; do
   case "${opts}" in
     n)
       NAMESPACE=${OPTARG}
-      ;;
-    p)
-      PASSWORD=${OPTARG}
       ;;
     *)
       usage
@@ -19,8 +16,16 @@ while getopts ":n:p:" opts; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${NAMESPACE}" ] || [ -z "${PASSWORD}" ]; then
+echo -n "Enter your password for 'admin' user [ENTER]: "
+read PASSWORD
+
+if [ -z "${NAMESPACE}" ]; then
     usage
+fi
+
+if [ -z "${PASSWORD}"]; then
+  echo "Password is empty"
+  exit
 fi
 
 MTIMESTR=$(TZ=GMT date +'%Y-%m-%dT%H:%M:%SZ')
