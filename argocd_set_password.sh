@@ -23,7 +23,7 @@ if [ -z "${NAMESPACE}" ]; then
     usage
 fi
 
-if [ -z "${PASSWORD}"]; then
+if [ -z "${PASSWORD}" ]; then
   echo "Password is empty"
   exit
 fi
