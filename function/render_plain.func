@@ -4,7 +4,7 @@ render_plain() {
   local namespace="${3:-${name}}"
   local directory="${4:-}"
 
-  # Overime zda mame values pro dany helmchart
+  # Overime zda mame adresar s custom resources
   if [ ! -d ./${directory}/${name} ]; then
     echo "${RED}Neexistuje adresar ./${directory}/${name} pro typ ${name}${NC}"
     echo "${RED}Vytvorte adresar ./${directory}/${name} a renderovani opakujte${NC}"
@@ -14,9 +14,7 @@ render_plain() {
 
   echo "${GREEN}Copy plain manifests: ${name}${NC}"
 
-  if [ $? -eq 0 ]; then
-    rm -rf resources/${name}
-    [ -d resources/${name} ] || mkdir -p resources/${name}
-    cp -r ./${directory}/${name}/* resources/${name}/
-  fi
+  rm -rf resources/${name}
+  [ -d resources/${name} ] || mkdir -p resources/${name}
+  cp -r ./${directory}/${name}/* resources/${name}/
 }

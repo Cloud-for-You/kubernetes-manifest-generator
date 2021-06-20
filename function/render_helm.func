@@ -13,6 +13,8 @@ render_helm() {
     exit 1
   fi
 
+  mkdir -p tmp
+
   cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
 
   local values_file="tmp/${name}.yaml"
