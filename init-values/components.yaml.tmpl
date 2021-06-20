@@ -1,6 +1,6 @@
 ARGOCD:
   - name: argocd-deployment-sys
-    version: v1.1.3
+    version: v1.1.4
     type: helm
     namespace: csas-argocd-sys
     appconfig:
@@ -8,7 +8,7 @@ ARGOCD:
         syncPolicy:
           automated: null
   - name: argocd-deployment-app
-    version: v1.1.3
+    version: v1.1.4
     type: helm
     namespace: csas-argocd-app
 CLUSTER_CONFIG:

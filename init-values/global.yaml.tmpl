@@ -26,7 +26,42 @@ workload: &workload
     - git@github.com:cs-poc/{}-*.git
     - https://github.com/cs-poc/{}-*.git
     - https://artifactory.csas.elostech.cz/artifactory/{}-helm
-environmentTypes: &envtypes OPERATOR_ENVIRONMENT_TYPES=dev,test
+environmentTypes: &envtypes OPERATOR_ENVIRONMENT_TYPES=deva,devb,devc,edu,int,prs,sys,pred
+roleBinding: &roleBinding
+  groups:
+    - name: OCP_{S}_DEV
+      environmentRoleBinding:
+        deva: edit
+        devb: edit
+        devc: edit
+        edu: view
+        int: view
+        prs: view
+        sys: view
+        pred: view
+        prod: view
+    - name: OCP_{S}_USR
+      environmentRoleBinding:
+        deva: view
+        devb: view
+        devc: view
+        edu: view
+        int: view
+        prs: view
+        sys: view
+        pred: view
+        prod: view
+    - name: OCP_{S}_OPS
+      environmentRoleBinding:
+        deva: edit
+        devb: edit
+        devc: edit
+        edu: edit
+        int: edit
+        prs: edit
+        sys: edit
+        pred: edit
+        prod: edit
 
 proxy: &proxy
   http_proxy: "http://ngproxy.csin.cz:8080/"

@@ -25,6 +25,7 @@ csas-project-operator:
         name: csas-project-operator-controller-manager
       spec:
         <<: *workload
+        <<: *roleBinding
   configMapGenerators:
     - name: controller-manager
       behavior: merge
