@@ -6,3 +6,9 @@ monitoring:
 
   monitoring-operator:
     nodeSelector: *nodeSelector
+
+  dashboardsConfigMaps:
+  - configMapName: csas-argocd
+    fileName: argocd.json
+  - configMapName: sealed-secrets-controller-sealed-secrets-controller
+    fileName: sealed-secrets-controller.json
