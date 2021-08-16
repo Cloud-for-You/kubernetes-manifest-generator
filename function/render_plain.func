@@ -5,9 +5,10 @@ render_plain() {
   local directory="${4:-}"
 
   # Overime zda mame adresar s custom resources
-  if [ ! -d ./${directory}/${name} ]; then
-    echo "${RED}Neexistuje adresar ./${directory}/${name} pro typ ${name}${NC}"
-    echo "${RED}Vytvorte adresar ./${directory}/${name} a renderovani opakujte${NC}"
+  plaindir="./${directory}/${name}"
+  if [ ! -d ${plaindir} ]; then
+    echo "${RED}Neexistuje adresar ${plaindir} pro typ ${name}${NC}"
+    echo "${RED}Vytvorte adresar ${plaindir} a renderovani opakujte${NC}"
     clean
     exit 1
   fi
@@ -16,5 +17,19 @@ render_plain() {
 
   rm -rf resources/${name}
   [ -d resources/${name} ] || mkdir -p resources/${name}
-  cp -r ./${directory}/${name}/* resources/${name}/
+  arefiles=$(echo "$plaindir/*") #are any files in plain resource dir
+  if (( ${arefiles} ))
+  then
+    cp -r "$plaindir/*" resources/${name}/
+  else
+    echo "${RED}Adresar ${plaindir} pro typ ${name} je prazdny${NC}"
+  fi
 }
+
+files=$(shopt -s nullglob dotglob; echo .//custom-resources/*)
+if (( ${#files} ))
+then
+  echo "contains files"
+else 
+  echo "empty (or does not exist or is a file)"
+fi
