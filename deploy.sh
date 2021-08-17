@@ -5,7 +5,7 @@
 #  echo $?
 #done
 
-oc apply -f resources/cluster-config/templates/MachineConfigs/ > /dev/null 2>&1
+oc apply -f resources/cluster-config/templates/RedHat/Cluster/MachineConfigs/ > /dev/null 2>&1
 
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
