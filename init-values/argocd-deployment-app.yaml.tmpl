@@ -8,3 +8,8 @@ argocd-deployment-app:
   - host: artifactory.csin.cz
     cert: *rootcacert
   nodeSelector: *nodeSelector
+  storage: *argocd-storage
+  grafana_dashboards:
+    create: false
+    namespace: csas-monitoring
+  readonly: false

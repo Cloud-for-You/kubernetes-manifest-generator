@@ -1,5 +1,6 @@
 memory: &memory 128Mi
 argons: &argons ARGOCD_NAMESPACE=csas-argocd-app
+prioclass: &prioclass argocd-deployment
 
 ##########
 csas-project-operator:
@@ -18,7 +19,7 @@ csas-project-operator:
                   memory: *memory
                 requests:
                   memory: *memory
-            priorityClassName: *priorityClass
+            priorityClassName: *prioclass
     - apiVersion: ops.csas.cz/v1
       kind: ProjectOperatorConfig
       metadata:
@@ -26,6 +27,9 @@ csas-project-operator:
       spec:
         <<: *workload
         <<: *roleBinding
+        <<: *argoRoleBinding
+        <<: *argoRolePolicies
+
   configMapGenerators:
     - name: controller-manager
       behavior: merge

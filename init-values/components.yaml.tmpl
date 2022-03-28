@@ -1,6 +1,6 @@
 ARGOCD:
   - name: argocd-deployment-sys
-    version: v1.1.4
+    version: v1.2.1
     type: helm
     namespace: csas-argocd-sys
     appconfig:
@@ -8,7 +8,7 @@ ARGOCD:
         syncPolicy:
           automated: null
   - name: argocd-deployment-app
-    version: v1.1.4
+    version: v1.2.1
     type: helm
     namespace: csas-argocd-app
 CLUSTER_CONFIG:
@@ -34,7 +34,7 @@ CUSTOM:
 CSAS_OPERATOR:
   - name: csas-project-operator
     artefact: config
-    version: 1.0.6
+    version: 1.1.0
     type: kustomize
   - name: csas-application-operator
     artefact: config

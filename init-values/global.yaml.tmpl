@@ -21,12 +21,12 @@ kustomize: &kustomize
   url: https://artifactory.csin.cz/artifactory/csas-openshift-generic-local/
 
 workload: &workload
-  applicationSource: https://github.com/cs-poc/{}-apps.git
+  applicationSource: https://github.com/csas-ops/{}-oaz-apps.git
   sourceRepos:
-    - git@github.com:cs-poc/{}-*.git
-    - https://github.com/cs-poc/{}-*.git
-    - https://artifactory.csas.elostech.cz/artifactory/{}-helm
-environmentTypes: &envtypes OPERATOR_ENVIRONMENT_TYPES=deva,devb,devc,edu,int,prs,sys,pred
+    - git@github.com:csas-ops/{}-*.git
+    - https://github.com/csas-ops/{}-*.git
+    - https://artifactory.csin.cz/artifactory/{}-helm
+environmentTypes: &envtypes OPERATOR_ENVIRONMENT_TYPES=dev,test
 roleBinding: &roleBinding
   groups:
     - name: OCP_{S}_DEV
@@ -62,12 +62,33 @@ roleBinding: &roleBinding
         sys: edit
         pred: edit
         prod: edit
-
+argoRoleBinding: &argoRoleBinding
+  argoRoleBindings:
+    controller:
+    - edit
+    server:
+    - view
+    - argocd-app-server-extra
+argoRolePolicies: &argoRolePolicies
+  appProjectRolePolicies:
+    - role: view
+      actions:
+        - get
+    - role: edit
+      actions:
+        - get
+        - sync
+        - delete
+        - action/*
 proxy: &proxy
   http_proxy: "http://ngproxy.csin.cz:8080/"
   https_proxy: "http://ngproxy.csin.cz:8080/"
   no_proxy: ".cluster.local,.csin.cz,.svc,localhost"
-
+argocd-storage: &argocd-storage
+  {}
+#  repoServer: 
+#    size: 1Gi
+#    storageClass: managed-premium
 rootcacert: &rootcacert |
   -----BEGIN CERTIFICATE-----
   MIIFhDCCA2ygAwIBAgICAbswDQYJKoZIhvcNAQENBQAwVjELMAkGA1UEBhMCQ1ox
