@@ -1,0 +1,49 @@
+render_helmlocal() {
+  local name="${1}"
+  local version="${2}"
+  local namespace="${3:-${name}}"
+  local repository="${4:-csas-openshift-helm}"
+  local helmchart="${5:-${name}}"
+
+  # Overime zda mame values pro dany helmchart
+  if [ ! -f values/${name}.yaml ]; then
+    echo "${RED}Neexistuje soubor values/${name}.yaml pro helmchart ${helmchart}${NC}"
+    echo "${RED}Vytvorte soubor values/${name}.yaml a renderovani opakujte${NC}"
+    clean
+    exit 1
+  fi
+
+  mkdir -p tmp
+
+  cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
+
+  local values_file="tmp/${name}.yaml"
+
+  echo "${GREEN}Render helm component: ${name} ${version}${NC}"
+  echo "Value files: ${values_file}"
+
+#  # Check search helmchart
+#  if [ "$(helm search repo ${repository}/${helmchart} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
+#    echo "${RED}v repository neni Helmchart ${helmchart} ve verzi ${version} k dispozici${NC}"
+#    return 1;
+#  fi
+
+  local postrenderer=""
+  if [ -f "postrender/${name}" ]; then
+    echo "${GREEN}Nastavuji post-renderer postrender/${name}${NC}"
+    postrenderer="--post-renderer postrender/${name}"
+  fi
+
+  # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
+  helm template ${name} "${repository}/${helmchart}-${version}.tgz" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace} ${postrenderer}
+
+  if [ $? -eq 0 ]; then
+    rm -rf resources/${name}
+    [ -d resources/${name} ] || mkdir -p resources/${name}
+    [ ! -d tmp/render/${helmchart}/crds ]      || mv tmp/render/${helmchart}/crds      resources/${name}
+    [ ! -d tmp/render/${helmchart}/templates ] || mv tmp/render/${helmchart}/templates resources/${name}
+    [ ! -d tmp/render/${helmchart}/charts ]    || mv tmp/render/${helmchart}/charts    resources/${name}
+    rm -rf tmp/render/${helmchart}
+  fi
+
+}
