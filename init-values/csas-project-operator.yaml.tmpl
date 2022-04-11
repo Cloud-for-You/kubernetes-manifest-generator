@@ -20,6 +20,8 @@ csas-project-operator:
                 requests:
                   memory: *memory
             priorityClassName: *prioclass
+            nodeSelector: *nodeSelector
+            tolerations: *tolerations
     - apiVersion: ops.csas.cz/v1
       kind: ProjectOperatorConfig
       metadata:

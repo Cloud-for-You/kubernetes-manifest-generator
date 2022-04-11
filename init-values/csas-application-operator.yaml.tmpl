@@ -19,6 +19,8 @@ csas-application-operator:
                 requests:
                   memory: *memory
             priorityClassName: *priorityClass
+            nodeSelector: *nodeSelector
+            tolerations: *tolerations
   configMapGenerators:
     - name: controller-manager
       behavior: merge

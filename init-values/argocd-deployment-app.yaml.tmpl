@@ -7,9 +7,10 @@ argocd-deployment-app:
   certs:
   - host: artifactory.csin.cz
     cert: *rootcacert
-  nodeSelector: *nodeSelector
   storage: *argocd-storage
   grafana_dashboards:
     create: false
     namespace: csas-monitoring
   readonly: false
+  nodeSelector: *nodeSelector
+  tolerations: *tolerations
