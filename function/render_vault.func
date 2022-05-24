@@ -1,0 +1,42 @@
+render_vault() {
+  local name="${1}"
+  local version="${2}"
+  local namespace="${3:-${name}}"
+  local repository="${4:-csas-openshift-generic-local}"
+  local artefact="${5:-${name}}"
+
+  if [ ! -d ${artefact} ]; then
+    echo "${RED}Neexistuje adresar ${artefact} pro typ ${name}${NC}"
+    echo "${RED}Vytvorte adresar ${artefact} a renderovani opakujte${NC}"
+    clean
+    exit 1
+  fi
+
+  mkdir -p tmp/render/${name}
+
+  echo "${GREEN}Render vaulted Secret to SealedSecret component: ${name} ${version}${NC}"
+  echo "Vault directory: ${artefact}"
+
+  local VAULT_FILES=$(find ${artefact} -type f -name 'secret_*' -print0 | xargs -0)
+
+  for vault_file in ${VAULT_FILES}; do
+    echo "${vault_file}"
+  done
+
+
+
+
+
+
+#  # Provedeme sealed
+#  kustomize build tmp/render/${name}/ -o tmp/render/${name}/templates
+#
+#  if [ $? -eq 0 ]; then
+#    rm -rf resources/${name}
+#    [ -d resources/${name} ] || mkdir -p resources/${name}
+#    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds resources/${name}
+#    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates resources/${name}
+#    rm -rf tmp/render/${name}
+#  fi
+
+}
