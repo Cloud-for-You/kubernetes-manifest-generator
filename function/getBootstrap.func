@@ -10,16 +10,16 @@ getBootstrap() {
 
   local argo_namespace=csas-argocd-sys
 
-  cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/resources/bootstrap/${name}.yaml
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.name' ${name}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'metadata.namespace' ${argo_namespace}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.source.path' resources/${name}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.destination.namespace' ${namespace}
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.project' ${appproject}
+  cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'metadata.name' ${name}
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'metadata.namespace' ${argo_namespace}
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.source.path' .FINAL_RESOURCES/${name}
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.destination.namespace' ${namespace}
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.project' ${appproject}
 
   if [ ! -z "${appconfig}" ]; then
-    echo "${appconfig}" | yq merge -i --overwrite ${ROOTDIR}/resources/bootstrap/${name}.yaml -
+    echo "${appconfig}" | yq merge -i --overwrite ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml -
   fi
 
 }

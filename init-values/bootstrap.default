@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: 
     targetRevision: 'master'
-    path: 'resources/component-name'
+    path: '.FINAL_RESOURCES/component-name'
     directory:
       recurse: true
   syncPolicy:

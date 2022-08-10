@@ -14,16 +14,16 @@ for function_file in `find $(dirname $0)/function/ -name *.func`; do
   . ${function_file}
 done
 clean
-[ -d ${ROOTDIR}/resources ] || mkdir -p ${ROOTDIR}/resources
-[ -d ${ROOTDIR}/resources/custom-resources ] || mkdir -p ${ROOTDIR}/resources/custom-resources
-[ -d ${ROOTDIR}/resources/bootstrap ] || mkdir -p ${ROOTDIR}/resources/bootstrap
+[ -d ${ROOTDIR}/.FINAL_RESOURCES ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES
+[ -d ${ROOTDIR}/.FINAL_RESOURCES/custom-.FINAL_RESOURCES ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES/custom-.FINAL_RESOURCES
+[ -d ${ROOTDIR}/.FINAL_RESOURCES/bootstrap ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES/bootstrap
 
 getComponents
 renderBootstrap
 
 # Provedeme GIT commit
 while true; do
-  read -p "${GREEN}Commit resources changes?${NC} [y/n] " yn
+  read -p "${GREEN}Commit .FINAL_RESOURCES changes?${NC} [y/n] " yn
   case $yn in
     [Yy]* )
       prepareVersion
@@ -41,7 +41,7 @@ done
 
 # Provedeme release do GITu
 while true; do
-  read -p "${GREEN}Release resources to cluster?${NC} [y/n] " yn
+  read -p "${GREEN}Release .FINAL_RESOURCES to cluster?${NC} [y/n] " yn
   case $yn in
     [Yy]* )
       releaseVersion

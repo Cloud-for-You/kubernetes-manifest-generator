@@ -24,7 +24,7 @@ cat <<EOF > "tmp/render/${name}/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: ${namespace}
-resources:
+.FINAL_RESOURCES:
 - https://artifactory.csin.cz/artifactory/${repository}/${name}/${artefact}-${version}.zip
 configMapGenerator:
 $(yq read -X "${values_file}" configMapGenerators)
@@ -40,10 +40,10 @@ fi
   kustomize build tmp/render/${name}/ -o tmp/render/${name}/templates
 
   if [ $? -eq 0 ]; then
-    rm -rf resources/${name}
-    [ -d resources/${name} ] || mkdir -p resources/${name}
-    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds resources/${name}
-    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates resources/${name}
+    rm -rf .FINAL_RESOURCES/${name}
+    [ -d .FINAL_RESOURCES/${name} ] || mkdir -p .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates .FINAL_RESOURCES/${name}
     rm -rf tmp/render/${name}
   fi
 

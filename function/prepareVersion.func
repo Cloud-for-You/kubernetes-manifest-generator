@@ -1,5 +1,5 @@
 prepareVersion() {
   git reset HEAD
-  git add values/ resources/
-  git commit -a -m "ADD/Update values and resources from new version"
+  git add values/ .FINAL_RESOURCES/
+  git commit -a -m "ADD/Update values and .FINAL_RESOURCES from new version"
 }

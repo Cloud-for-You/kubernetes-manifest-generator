@@ -1,7 +1,7 @@
 deploy_argoapp() {
   echo "${GREEN}DEPLOY ARGOCD-APP${NC}"
 
-  local RENDER_DIRECTORY=${1:-resources/argocd-deployment-app}
+  local RENDER_DIRECTORY=${1:-.FINAL_RESOURCES/argocd-deployment-app}
 
   # Create Namespace for ArgoCD-APP
   local NAMESPACE_FILE=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -l "kind: Namespace")

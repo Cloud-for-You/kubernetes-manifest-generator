@@ -34,15 +34,15 @@ render_helm() {
     postrenderer="--post-renderer postrender/${name}"
   fi
 
-  # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky resources
+  # Provedeme render daneho deploymentu a v pripade uspechu jej presuneme do cilove slozky .FINAL_RESOURCES
   helm template ${name} "${repository}/${helmchart}" -f ${values_file} --include-crds --output-dir tmp/render --version ${version} -n ${namespace} ${postrenderer}
 
   if [ $? -eq 0 ]; then
-    rm -rf resources/${name}
-    [ -d resources/${name} ] || mkdir -p resources/${name}
-    [ ! -d tmp/render/${helmchart}/crds ]      || mv tmp/render/${helmchart}/crds      resources/${name}
-    [ ! -d tmp/render/${helmchart}/templates ] || mv tmp/render/${helmchart}/templates resources/${name}
-    [ ! -d tmp/render/${helmchart}/charts ]    || mv tmp/render/${helmchart}/charts    resources/${name}
+    rm -rf .FINAL_RESOURCES/${name}
+    [ -d .FINAL_RESOURCES/${name} ] || mkdir -p .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${helmchart}/crds ]      || mv tmp/render/${helmchart}/crds      .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${helmchart}/templates ] || mv tmp/render/${helmchart}/templates .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${helmchart}/charts ]    || mv tmp/render/${helmchart}/charts    .FINAL_RESOURCES/${name}
     rm -rf tmp/render/${helmchart}
   fi
 

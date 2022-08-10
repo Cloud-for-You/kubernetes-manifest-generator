@@ -4,7 +4,7 @@ render_plain() {
   local namespace="${3:-${name}}"
   local directory="${4:-}"
 
-  # Overime zda mame adresar s custom resources
+  # Overime zda mame adresar s custom .FINAL_RESOURCES
   if [ -n "$directory" ];then
   plaindir="./${directory}/${name}"
   else
@@ -19,8 +19,8 @@ render_plain() {
 
   echo "${GREEN}Copy plain manifests: ${name}${NC}"
 
-  rm -rf resources/${name}
-  [ -d resources/${name} ] || mkdir -p resources/${name}
-  [[ $(ls -A $plaindir) ]] && cp -r $plaindir/* resources/${name}/ || echo "${RED}Adresar ${plaindir} pro typ ${name} je prazdny${NC}"
+  rm -rf .FINAL_RESOURCES/${name}
+  [ -d .FINAL_RESOURCES/${name} ] || mkdir -p .FINAL_RESOURCES/${name}
+  [[ $(ls -A $plaindir) ]] && cp -r $plaindir/* .FINAL_RESOURCES/${name}/ || echo "${RED}Adresar ${plaindir} pro typ ${name} je prazdny${NC}"
 }
 

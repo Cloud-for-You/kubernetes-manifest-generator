@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#for file in $(find resources/cluster-config/MachineConfigs/ -type f); do
+#for file in $(find .FINAL_RESOURCES/cluster-config/MachineConfigs/ -type f); do
 #  oc create --save-config -f ${file} > /dev/null 2>&1 
 #  echo $?
 #done
 
-oc apply -f resources/cluster-config/templates/RedHat/Cluster/MachineConfigs/ > /dev/null 2>&1
+oc apply -f .FINAL_RESOURCES/cluster-config/templates/RedHat/Cluster/MachineConfigs/ > /dev/null 2>&1
 
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`

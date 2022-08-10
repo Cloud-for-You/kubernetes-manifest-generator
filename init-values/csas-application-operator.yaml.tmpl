@@ -13,7 +13,7 @@ csas-application-operator:
           spec:
             containers:
             - name: manager
-              resources:
+              .FINAL_RESOURCES:
                 limits:
                   memory: *memory
                 requests:

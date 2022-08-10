@@ -5,12 +5,12 @@ renderBootstrap() {
   local argo_namespace=csas-argocd-sys
 
   local name=bootstrap
-  cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/resources/bootstrap/${name}.yaml
+  cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
   getBootstrap "${name}" "" "${argo_namespace}"
-  yq write -i ${ROOTDIR}/resources/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false"
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false"
 
   local workload_repo=$(yq read -X ${global_value_file} 'app_repo')
-  cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/resources/bootstrap/projects.yaml
-  yq write -i ${ROOTDIR}/resources/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
+  cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
 
 }

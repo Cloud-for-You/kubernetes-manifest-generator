@@ -248,7 +248,7 @@ PWD musí být v adresáři se systémovým GIT repository (ex. ocp-oaz-lab1-sys
 # values/components.yaml
 # run render
 # 
-./script/render_resources.sh
+./script/render_.FINAL_RESOURCES.sh
 ```
 
 ## INSTALL RESOURCES

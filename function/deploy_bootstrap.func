@@ -1,4 +1,4 @@
 deploy_bootstrap() {
   echo "deploy Bootstrap applications"
-  oc create --save-config -n csas-argocd-sys -R -f resources/bootstrap/bootstrap.yaml
+  oc create --save-config -n csas-argocd-sys -R -f .FINAL_RESOURCES/bootstrap/bootstrap.yaml
 }

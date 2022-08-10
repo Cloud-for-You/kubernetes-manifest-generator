@@ -1,7 +1,7 @@
 deploy_argosys() {
   echo "${GREEN}DEPLOY ARGOCD-SYS${NC}"
 
-  local RENDER_DIRECTORY=${1:-resources/argocd-deployment-sys}
+  local RENDER_DIRECTORY=${1:-.FINAL_RESOURCES/argocd-deployment-sys}
 
   # Create CRDs for ArgoCD
   local CRDS_FILES=$(find ${RENDER_DIRECTORY} -type f -print0 | xargs -0 grep -l "kind: CustomResourceDefinition")
