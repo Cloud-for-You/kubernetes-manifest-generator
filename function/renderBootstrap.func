@@ -4,6 +4,8 @@ renderBootstrap() {
   local git_repo=$(yq read -X ${global_value_file} 'system_repo')
   local argo_namespace=csas-argocd-sys
 
+  local CLUSTER_NAME=$(yq read ${ROOTDIR}/values/global.yaml clusterName)
+
   local name=bootstrap
   cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
   getBootstrap "${name}" "" "${argo_namespace}"
