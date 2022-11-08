@@ -15,6 +15,6 @@ renderBootstrap() {
   cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' ${CLUSTER_NAME:-.}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' openshift
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' master
 
 }
