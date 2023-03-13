@@ -47,7 +47,9 @@ deploy_argoapp() {
 
   # DEX Secret
   echo "Configure DEX secret"
-  local DEXSECRET=$(oc -n ${NAMESPACE} serviceaccounts get-token argocd-dex-server)
+  #local DEXSECRET=$(oc -n ${NAMESPACE} serviceaccounts get-token argocd-dex-server)
+  local DEXSECRET=$(oc -n ${NAMESPACE} get secret argocd-dex-server-token-sso -o go-template='{{ .data.token | base64decode }}')
+
   if [ -z "${DEXSECRET}" ]; then
     echo "Can't setup empty dex secret" 
   else
