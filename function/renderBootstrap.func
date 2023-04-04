@@ -14,7 +14,8 @@ renderBootstrap() {
   local workload_repo=$(yq read -X ${global_value_file} 'app_repo')
   cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' ${CLUSTER_NAME:-.}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' master
+  #yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' ${CLUSTER_NAME:-.}
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' _PROJECTS_
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' openshift
 
 }
