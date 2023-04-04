@@ -18,7 +18,7 @@ renderBootstrap() {
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' _PROJECTS_
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' openshift
 
-  cp ${ROOTDIR}/script/init-value/bootstrap.projects-manifests ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
+  cp ${ROOTDIR}/script/init-values/bootstrap.projects-manifests ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.repoURL' ${workload_repo}
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.project' onboarding
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.path' ${CLUSTER_NAME:-.}
