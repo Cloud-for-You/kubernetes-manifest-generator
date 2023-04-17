@@ -16,12 +16,11 @@ renderBootstrap() {
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.project' onboarding
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' _PROJECTS_
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' openshift
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' master
 
   cp ${ROOTDIR}/script/init-values/bootstrap.projects-manifests ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.repoURL' ${workload_repo}
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.project' onboarding
   yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.path' ${CLUSTER_NAME:-.}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.targetRevision' openshift
-
+  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.targetRevision' master
 }
