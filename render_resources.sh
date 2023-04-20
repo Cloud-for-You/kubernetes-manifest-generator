@@ -15,7 +15,7 @@ for function_file in `find $(dirname $0)/function/ -name *.func`; do
 done
 clean
 [ -d ${ROOTDIR}/.FINAL_RESOURCES ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES
-[ -d ${ROOTDIR}/.FINAL_RESOURCES/custom-.FINAL_RESOURCES ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES/custom-.FINAL_RESOURCES
+[ -d ${ROOTDIR}/.FINAL_RESOURCES/custom-resources ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES/custom-resources
 [ -d ${ROOTDIR}/.FINAL_RESOURCES/bootstrap ] || mkdir -p ${ROOTDIR}/.FINAL_RESOURCES/bootstrap
 
 getComponents
