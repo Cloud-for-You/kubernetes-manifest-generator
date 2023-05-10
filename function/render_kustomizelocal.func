@@ -1,0 +1,57 @@
+render_kustomizelocal() {
+  local name="${1}"
+  local version="${2}"
+  local namespace="${3:-${name}}"
+  local repository="${4:-csas-openshift-generic-local}"
+  local artefact="${5:-${name}}"
+
+  mkdir -p tmp/render/${name}/templates
+
+  cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
+  local values_file="tmp/${name}.yaml"
+
+  cp -r "${name}" "tmp/render/${name}/kustomize"
+
+  echo "${GREEN}Render kustomize component: ${name} ${version}${NC}"
+  echo "Value files: ${values_file}"
+
+  local num=$(yq read "${values_file}" --length patches); num=${num:=0}
+  local i
+  for (( i=0; i < "${num}"; ++i )); do
+    yq read -X "${values_file}" patches.[${i}]
+    echo "---"
+  done > tmp/render/${name}/patches.yaml
+
+  local setup_namespace="namespace: ${namespace}"
+  if [ "${namespace}" == '-' ]; then
+    local setup_namespace=""
+  fi
+
+cat <<EOF > "tmp/render/${name}/kustomization.yaml"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+${setup_namespace}
+resources:
+- kustomize
+configMapGenerator:
+$(yq read -X "${values_file}" configMapGenerators)
+EOF
+
+if [ "${num}" -gt 0 ]; then
+cat <<EOF >> "tmp/render/${name}/kustomization.yaml"
+patchesStrategicMerge:
+- patches.yaml
+EOF
+fi
+
+  kustomize build tmp/render/${name}/ -o tmp/render/${name}/templates
+
+  if [ $? -eq 0 ]; then
+    rm -rf .FINAL_RESOURCES/${name}
+    [ -d .FINAL_RESOURCES/${name} ] || mkdir -p .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${name}/crds ] || mv tmp/render/${name}/crds .FINAL_RESOURCES/${name}
+    [ ! -d tmp/render/${name}/templates ] || mv tmp/render/${name}/templates .FINAL_RESOURCES/${name}
+    rm -rf tmp/render/${name}
+  fi
+
+}
