@@ -1,0 +1,23 @@
+kind: PodDisruptionBudget
+apiVersion: policy/v1
+metadata:
+  name: argocd-redis-ha-server
+  labels:
+    app.kubernetes.io/name: argocd-redis-ha
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-redis-ha
+---
+kind: PodDisruptionBudget
+apiVersion: policy/v1
+metadata:
+  name: argocd-redis-ha-haproxy
+  labels:
+    app.kubernetes.io/name: argocd-redis-ha-haproxy
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-redis-ha-haproxy

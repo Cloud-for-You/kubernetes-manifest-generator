@@ -1,0 +1,194 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: argocd
+spec:
+#################### Components ####################
+# ---------- Application controller ---------- #
+  controller:
+    logFormat: json
+    resources:
+      requests:
+        cpu: '1'
+        memory: 1Gi
+      limits:
+        cpu: '2'
+        memory: 2Gi
+# ---------- Server ---------- #
+  server:
+    host: argocd-sys.apps.<CLUSTER>.<DOMAIN> # PER-CLUSTER: cluster address
+    ingress:
+      enabled: false
+    logFormat: json
+    replicas: 2
+    route:
+      enabled: true
+      tls:
+        termination: reencrypt
+        insecureEdgeTerminationPolicy: Redirect
+    resources:
+      requests:
+        cpu: 125m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+# ---------- Repo Server ---------- #
+  repo:
+    logFormat: json
+    replicas: 2
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: '1'
+        memory: '1Gi'
+# ---------- Notifications controller ---------- #
+  notifications:
+    enabled: false
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+# ---------- DEX server ---------- #
+  dex:
+    groups:
+      - OPENSHIFT4_CLUSTER_ADMINS
+    openShiftOAuth: true
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+# ---------- Redis ---------- #
+  redis:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+#################### GLOBAL ####################
+# ---------- Config ---------- #
+  applicationInstanceLabelKey: argocd.argoproj.io/instance-sys
+  extraConfig:
+    ui.bannerpermanent: 'true'
+    ui.bannerposition: top
+    ui.cssurl: 'https://argocd-sys-styles.apps.<CLUSTER>.<DOMAIN>' # PER-CLUSTER: cluster address
+# ---------- Security ---------- #
+  disableAdmin: true
+  rbac:
+    defaultPolicy: 'role:none'
+    policy: |
+      g, role:ocp-argocd-sys-admin, role:readonly
+      p, role:ocp-argocd-sys-admin, applications, sync, */*, allow
+      g, OPENSHIFT4_CLUSTER_ADMINS, role:ocp-argocd-sys-admin
+  initialSSHKnownHosts:
+    keys: >
+      [sdf.csin.cz]:2222 ssh-rsa
+      AAAAB3NzaC1yc2EAAAADAQABAAABAQDRRdAl8AmKjepHQ/2ybi46nlx2lP+Nq4k1pEdZYtduSeiQI1T455UGT8vbM5awTlou+/bsU9FlfeRviWYgyRp6QjUXeiPSrf8ZzGAaecl+xRgc1T41K9VB9ExDXxxqcqLdQFdsldbEWLXGEIlXxAVcIbK/BWCWeTU+nblmz+l4eejCybluN+Itx1Q70vSwb3QUer9IDhDz6iHJQNbYwiMkuTtNbWsrI/xaDsEqUc0d6gN9dAixFGJVXZ9F3Hei2sW/5f07/3a6WEMTpJ41D4jJsaOpWqk+QRqRtefGMUtyH4k5wgGcK/+8xbNJLndsFPZ6iVZhCmwwzYdYxU3sfYSR
+# ---------- High availability ---------- #
+  ha:
+    enabled: true
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+# ---------- Resources configuration ---------- #
+  resourceHealthChecks:
+    - kind: Project
+      group: ops.csas.cz
+      check: |
+        hs = {}
+        pStat = "True"
+        aStat = "True"
+        aReas = "Error"
+        aMesg = "csas-project-operator error"
+        if obj.status ~= nil then
+          if obj.status.conditions ~= nil then
+            for i, condition in ipairs(obj.status.conditions) do
+              if (condition.type == "Progressing") then
+                pStat = condition.status
+              end
+              if (condition.type == "Available") then
+                aStat = condition.status
+                aReas = condition.reason
+                aMesg = condition.message
+              end
+            end
+          end
+        end
+        if (aStat == "True") then
+          if (pStat == "False") then
+            hs.status = "Healthy"
+            hs.message = "All resources created"
+            return hs
+          else
+            hs.status = "Progressing"
+            hs.message = "Waiting for csas-project-operator"
+            return hs
+          end
+        end
+        hs.status = "Degraded"
+        hs.message = aReas .. " - " .. aMesg
+        return hs
+    - kind: ProjectEnvironment
+      group: ops.csas.cz
+      check: |
+        hs = {}
+        pStat = "True"
+        aStat = "True"
+        aReas = "Error"
+        aMesg = "csas-project-operator error"
+        if obj.status ~= nil then
+          if obj.status.conditions ~= nil then
+            for i, condition in ipairs(obj.status.conditions) do
+              if (condition.type == "Progressing") then
+                pStat = condition.status
+              end
+              if (condition.type == "Available") then
+                aStat = condition.status
+                aReas = condition.reason
+                aMesg = condition.message
+              end
+            end
+          end
+        end
+        if (aStat == "True") then
+          if (pStat == "False") then
+            hs.status = "Healthy"
+            hs.message = "All resources created"
+            return hs
+          else
+            hs.status = "Progressing"
+            hs.message = "Waiting for csas-project-operator"
+            return hs
+          end
+        end
+        hs.status = "Degraded"
+        hs.message = aReas .. " - " .. aMesg
+        return hs
+  resourceExclusions: |
+    - apiGroups:
+      - "project.openshift.io"
+      kinds:
+      - "Project"
+      clusters:
+      - "*"
+  resourceIgnoreDifferences:
+    resourceIdentifiers:
+      - group: ops.csas.cz
+        kind: Application
+        customization:
+          jqPathExpressions:
+            - .metadata.finalizers[] | select( . == "ops.csas.cz/application-operator" )

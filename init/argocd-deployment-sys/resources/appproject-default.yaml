@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  description: System components
+  destinations:
+    - namespace: '*'
+      server: 'https://kubernetes.default.svc'
+  roles: []
+  sourceRepos:
+    - 'ssh://git@sdf.csin.cz:2222/ocp4/ocp-onprem-<CLUSTER>-system.git'  # PER-CLUSTER: repo
+    - 'ssh://git@sdf.csin.cz:2222/ocp4/ocp-onprem-<PROJECT>-project.git' # PER-CLUSTER: repo

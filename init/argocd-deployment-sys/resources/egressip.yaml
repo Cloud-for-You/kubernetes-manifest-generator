@@ -1,0 +1,11 @@
+apiVersion: k8s.ovn.org/v1
+kind: EgressIP
+metadata:
+  name: csas-argocd-sys
+spec:
+  egressIPs:
+  - <EGRESSIP> # PER-CLUSTER: egress ip
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: csas-argocd-sys
+  podSelector: {}

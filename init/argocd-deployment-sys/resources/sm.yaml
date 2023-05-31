@@ -1,0 +1,32 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: argocd-dex-server-metrics
+  labels:
+    app.kubernetes.io/instance: argocd-deployment-sys
+    app.kubernetes.io/name: argocd-dex-server
+spec:
+  ports:
+    - name: metrics
+      protocol: TCP
+      port: 5558
+      targetPort: metrics
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: argocd-dex-server
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: argocd-dex-server
+  labels:
+    app.kubernetes.io/instance: argocd-deployment-sys
+    app.kubernetes.io/name: argocd-dex-server
+spec:
+  endpoints:
+    - path: /metrics
+      port: metrics
+  namespaceSelector: {}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-dex-server

@@ -1,0 +1,25 @@
+kind: PodDisruptionBudget
+apiVersion: policy/v1
+metadata:
+  name: argocd-repo-server
+  labels:
+    app.kubernetes.io/instance: argocd-deployment-app
+    app.kubernetes.io/name: argocd-repo-server
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-repo-server
+---
+kind: PodDisruptionBudget
+apiVersion: policy/v1
+metadata:
+  name: argocd-server
+  labels:
+    app.kubernetes.io/instance: argocd-deployment-app
+    app.kubernetes.io/name: argocd-server
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server

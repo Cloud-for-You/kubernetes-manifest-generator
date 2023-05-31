@@ -1,5 +1,4 @@
 memory: &memory 128Mi
-argons: &argons ARGOCD_NAMESPACE=csas-argocd-app
 
 ##########
 csas-application-operator:
@@ -13,16 +12,17 @@ csas-application-operator:
           spec:
             containers:
             - name: manager
-              .FINAL_RESOURCES:
+              resources:
                 limits:
                   memory: *memory
                 requests:
                   memory: *memory
-            priorityClassName: *priorityClass
-            nodeSelector: *nodeSelector
+            priorityClassName: openshift-user-critical
+            affinity:
+              nodeAffinity: *nodeAffinity
             tolerations: *tolerations
   configMapGenerators:
     - name: controller-manager
       behavior: merge
       literals:
-        - *argons
+        - ARGOCD_NAMESPACE=csas-argocd-app

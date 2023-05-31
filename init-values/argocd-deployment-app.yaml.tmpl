@@ -1,16 +1,617 @@
 argocd-deployment-app:
-  baseDomain: *baseDomain
-  clusterName: *clusterName
-  git: *git
-  helm: *helm
-  proxy: *proxy
-  certs:
-  - host: artifactory.csin.cz
-    cert: *rootcacert
-  storage: *argocd-storage
-  grafana_dashboards:
-    create: false
-    namespace: csas-monitoring
-  readonly: false
-  nodeSelector: *nodeSelector
-  tolerations: *tolerations
+  ################################################################################
+  fullnameOverride: argocd
+  crds:
+    install: false
+  ################################################################################
+  cluster:
+    baseDomain: *baseDomain
+    clusterName: *clusterName
+    url: &url https://argocd-app.apps.tocp4s.csin.cz # PER-CLUSTER: cluster address
+    rbacPolicy: &rbacPolicy |
+      g, role:ocp-argocd-app-admin, role:readonly
+      p, role:ocp-argocd-app-admin, applications, sync, */*, allow
+      g, OPENSHIFT4_CLUSTER_ADMINS, role:ocp-argocd-app-admin
+
+      p, role:ocp-argocd-app-view, applications, get, */*, allow
+      g, OPENSHIFT4_CLUSTER_READER, role:ocp-argocd-app-view
+    dexConfig: &dexConfig |
+      connectors:
+        # OpenShift
+        - type: openshift
+          id: openshift
+          name: OpenShift
+          config:
+            issuer: https://kubernetes.default.svc
+            clientID: system:serviceaccount:csas-argocd-app:argocd-dex-server
+            clientSecret: $dex.openshift.secret
+            redirectURI: https://argocd-app.apps.tocp4s.csin.cz/api/dex/callback # PER-CLUSTER: cluster address
+            insecureCA: true
+    proxy: *proxy
+    githubAppID: &githubAppID "216092" # PER-CLUSTER: github app
+    githubAppInstallationID: &githubAppInstallationID "26987120" # PER-CLUSTER: github app inst id
+    artifactoryUser: &artifactoryUser "sysopenshift-read"
+    uiColor: &uiColor "#248037"                 # PER-CLUSTER: LAB: #ff647e       TEST: #248037     PRED: #c08c00     PROD: #982c2c
+    uiColorRGBA: &uiColorRGBA "36,128,55"       # PER-CLUSTER: LAB: 255,100,126   TEST: 36,128,55   PRED: 192,128,0   PROD:152,44,44
+    egressIP: &egressIP 10.88.63.253            # PER-CLUSTER: egress ip (optional, for lab may be empty)
+  ################################################################################
+  instance:
+    argocdInstance: &argoCDInstance argocd-app
+    labelKey: &labelKey argocd.argoproj.io/instance-app
+    clusterAdminAccess: &clusterAdminAccess false
+    exclusions: &exclusions |
+      - apiGroups:
+        - "tekton.dev"
+        clusters:
+        - "*"
+        kinds:
+        - "*"
+    customizations: &customizations
+      resource.customizations.health.ops.csas.cz_Application: |
+        hs = {}
+        if obj.status ~= nil then
+          if obj.status.conditions ~= nil then
+            for i, condition in ipairs(obj.status.conditions) do
+              if condition.type == "Available" and condition.status == "False" then
+                hs.status = "Progressing"
+                hs.message = condition.message
+                return hs
+              end
+              if condition.type == "Available" and condition.status == "True" then
+                return obj.status.application.health
+              end
+            end
+          end
+        end
+
+        hs.status = "Progressing"
+        hs.message = "Waiting for csas-application-operator"
+        return hs
+      resource.customizations.ignoreDifferences.ops.csas.cz_Application: |
+        jqPathExpressions:
+          - .metadata.finalizers[] | select( . == "ops.csas.cz/application-operator" )
+    metricsRules: &metricsRules
+      {}
+    extraAppProject: &extraAppProject
+      apiVersion: argoproj.io/v1alpha1
+      kind: AppProject
+      metadata:
+        name: default
+        annotations:
+          argocd.argoproj.io/sync-options: Prune=false,SkipDryRunOnMissingResource=true
+        labels:
+          app.kubernetes.io/instance: *argoCDInstance
+          app.kubernetes.io/name: default
+          app.kubernetes.io/part-of: argocd
+      spec:
+        description: Default AppProject
+        destinations:
+        - namespace: csas-argocd-app
+          server: https://kubernetes.default.svc
+        roles: []
+        sourceRepos: []
+    extraClusterRoleServer: &extraClusterRoleServer
+      {}
+    extraClusterRoleServerExtra: &extraClusterRoleServerExtra
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        labels:
+          app.kubernetes.io/component: server
+          app.kubernetes.io/instance: *argoCDInstance
+          app.kubernetes.io/name: argocd-server
+          app.kubernetes.io/part-of: argocd
+        name: "{{ .Values.instance.argocdInstance }}-server-extra"
+      rules:
+      - apiGroups:
+        - apps
+        resources:
+        - deployments
+        - statefulsets
+        verbs:
+        - patch
+      - apiGroups:
+        - apps.openshift.io
+        resources:
+        - deploymentconfigs
+        verbs:
+        - patch
+      - apiGroups:
+        - ""
+        resources:
+        - replicationcontrollers
+        - pods
+        verbs:
+        - delete
+      - apiGroups:
+        - apps
+        resources:
+        - replicasets
+        verbs:
+        - delete
+      - apiGroups:
+        - batch
+        resources:
+        - jobs
+        verbs:
+        - delete
+      - apiGroups:
+        - route.openshift.io
+        resources:
+        - routes
+        verbs:
+        - delete
+    extraClusterRoleApplicationController: &extraClusterRoleApplicationController
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        labels:
+          app.kubernetes.io/component: application-controller
+          app.kubernetes.io/instance: *argoCDInstance
+          app.kubernetes.io/name: argocd-application-controller
+          app.kubernetes.io/part-of: argocd
+        name: "{{ .Values.instance.argocdInstance }}-application-controller"
+      rules:
+      - apiGroups:
+        - '*'
+        resources:
+        - '*'
+        verbs:
+        - list
+        - watch
+    extraClusterRoleBindingServer: &extraClusterRoleBindingServer
+      {}
+    extraClusterRoleBindingApplicationController: &extraClusterRoleBindingApplicationController
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        labels:
+          app.kubernetes.io/component: application-controller
+          app.kubernetes.io/instance: *argoCDInstance
+          app.kubernetes.io/name: argocd-application-controller
+          app.kubernetes.io/part-of: argocd
+        name: "{{ .Values.instance.argocdInstance }}-application-controller"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: "{{ .Values.instance.argocdInstance }}-application-controller"
+      subjects:
+      - kind: ServiceAccount
+        name: "argocd-application-controller"
+        namespace: "csas-{{ .Values.instance.argocdInstance }}"
+    extraRouteWebhook: &extraRouteWebhook
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        annotations:
+          argocd.argoproj.io/sync-options: Validate=false
+        labels:
+          app.kubernetes.io/component: server
+          app.kubernetes.io/instance: *argoCDInstance
+          app.kubernetes.io/name: argocd-server
+          app.kubernetes.io/part-of: argocd
+          ingress-router: dmz
+        name: "argocd-server-webhook"
+      spec:
+        host: "{{ .Values.instance.argocdInstance }}.dmz.{{ .Values.cluster.clusterName }}.{{ .Values.cluster.baseDomain }}"
+        port:
+          targetPort: http
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge
+        to:
+          kind: Service
+          name: argocd-server
+          weight: 100
+        wildcardPolicy: None
+  ################################################################################
+  global:
+    revisionHistoryLimit: 2
+    networkPolicy:
+      create: false
+    logging:
+      format: json
+    affinity:
+      nodeAffinity:
+        type: soft
+        matchExpressions: *nodeAffinityExpressions
+      podAntiAffinity: hard
+    tolerations: *tolerations
+  openshift:
+    enabled: true
+  configs:
+    cm:
+      url: *url
+      application.instanceLabelKey: *labelKey
+      server.rbac.log.enforce.enable: "false"
+      exec.enabled: "false"
+      users.anonymous.enabled: "false"
+      dex.config: *dexConfig
+      resource.exclusions: *exclusions
+      <<: *customizations
+      ui.bannerpermanent: "true"
+      ui.bannerposition: "top"
+      ui.cssurl: "./custom/custom.styles.css"       # Helm chart Values.configs.styles not used beacuse it can't be templated; see argocd-styles-cm extra resource
+    params:
+      server.insecure: "true"
+    rbac:
+      policy.default: role:none
+      policy.csv: *rbacPolicy
+      scopes: null
+    ssh:
+      extraHosts: |
+        [sdf.csin.cz]:2222 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRRdAl8AmKjepHQ/2ybi46nlx2lP+Nq4k1pEdZYtduSeiQI1T455UGT8vbM5awTlou+/bsU9FlfeRviWYgyRp6QjUXeiPSrf8ZzGAaecl+xRgc1T41K9VB9ExDXxxqcqLdQFdsldbEWLXGEIlXxAVcIbK/BWCWeTU+nblmz+l4eejCybluN+Itx1Q70vSwb3QUer9IDhDz6iHJQNbYwiMkuTtNbWsrI/xaDsEqUc0d6gN9dAixFGJVXZ9F3Hei2sW/5f07/3a6WEMTpJ41D4jJsaOpWqk+QRqRtefGMUtyH4k5wgGcK/+8xbNJLndsFPZ6iVZhCmwwzYdYxU3sfYSR
+  applicationSet:
+    enabled: false
+  notifications:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        relabelings:
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
+          replacement: kube_$1
+    argocdUrl: *url
+    context: {}
+    notifiers: {}
+    subscriptions: []
+    templates: {}
+    triggers: {}
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  dex:
+    extraArgs:
+    - --logformat
+    - json
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        relabelings:
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
+          replacement: kube_$1
+    priorityClassName: openshift-user-critical
+    serviceAccount:
+      annotations:
+        serviceaccounts.openshift.io/oauth-redirectreference.argocd: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"argocd-server"}}'
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  redis-ha:
+    enabled: true
+    labels:
+      app.kubernetes.io/part-of: argocd
+    securityContext:
+      runAsUser: null
+      fsGroup: null
+      supplementalGroups:
+      - 1000
+    containerSecurityContext:
+      runAsUser: null
+    haproxy:
+      securityContext:
+        runAsUser: null
+        fsGroup: null
+        supplementalGroups:
+        - 99
+      podDisruptionBudget:
+        maxUnavailable: 1
+      additionalAffinities:
+        nodeAffinity: *nodeAffinity
+    podDisruptionBudget:
+      maxUnavailable: 1
+    additionalAffinities:
+      nodeAffinity: *nodeAffinity
+    tolerations: *tolerations
+  redis:
+    enabled: false
+    priorityClassName: openshift-user-critical
+    serviceAccount:
+      create: true
+    image:
+      repository: redis
+      imagePullPolicy: null
+    securityContext:
+      runAsUser: 
+    resources:
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  repoServer:
+    clusterAdminAccess:
+      enabled: *clusterAdminAccess
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        relabelings:
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
+          replacement: kube_$1
+    priorityClassName: openshift-user-critical
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1024Mi
+    envFrom:
+    - configMapRef:
+        name: proxy
+    replicas: 2
+    pdb:
+      enabled: true
+      maxUnavailable: 1
+  server:
+    clusterAdminAccess:
+      enabled: *clusterAdminAccess
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        relabelings:
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
+            replacement: kube_$1
+    priorityClassName: openshift-user-critical
+    resources:
+      requests:
+        cpu: 125m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    envFrom:
+    - configMapRef:
+        name: proxy
+    replicas: 2
+    pdb:
+      enabled: true
+      maxUnavailable: 1
+  controller:
+    clusterAdminAccess:
+      enabled: *clusterAdminAccess
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        relabelings:
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
+          replacement: kube_$1
+      rules: *metricsRules
+      applicationLabels:
+        enabled: true
+        labels:
+        - ops.csas.cz/top-level-application
+    priorityClassName: openshift-user-critical
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 1024Mi
+      limits:
+        cpu: 2000m
+        memory: 2048Mi
+  extraObjects:
+  - apiVersion: v1
+    data:
+      http_proxy: "{{ .Values.cluster.proxy.http_proxy }}"
+      https_proxy: "{{ .Values.cluster.proxy.https_proxy }}"
+      NO_PROXY: "{{ .Values.cluster.proxy.no_proxy }},argocd-repo-server,argocd-application-controller,argocd-server,argocd-redis,argocd-dex-server"
+    kind: ConfigMap
+    metadata:
+      name: proxy
+      labels:
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/part-of: argocd
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      annotations:
+        argocd.argoproj.io/sync-options: Validate=false
+      labels:
+        app.kubernetes.io/component: server
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/name: argocd-server
+        app.kubernetes.io/part-of: argocd
+      name: "argocd-server"
+    spec:
+      host: "{{ .Values.instance.argocdInstance }}.apps.{{ .Values.cluster.clusterName }}.{{ .Values.cluster.baseDomain }}"
+      port:
+        targetPort: http
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+      to:
+        kind: Service
+        name: argocd-server
+        weight: 100
+      wildcardPolicy: None
+  - *extraRouteWebhook
+  - *extraAppProject
+  - *extraClusterRoleServer
+  - *extraClusterRoleServerExtra
+  - *extraClusterRoleApplicationController
+  - *extraClusterRoleBindingServer
+  - *extraClusterRoleBindingApplicationController
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      annotations:
+        kubernetes.io/service-account.name: argocd-dex-server
+      labels:
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/part-of: argocd
+        ops.csas.cz/secret-type: dex-token
+      name: argocd-dex-server-token-sso
+    type: kubernetes.io/service-account-token
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      labels:
+        argocd.argoproj.io/secret-type: repo-creds
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/part-of: argocd
+      name: token-git-github-csas-ops
+    type: Opaque
+    stringData:
+      githubAppID: *githubAppID
+      githubAppInstallationID: *githubAppInstallationID
+      type: git
+      url: https://github.com/csas-ops/
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      labels:
+        argocd.argoproj.io/secret-type: repo-creds
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/part-of: argocd
+      name: token-helm-artifactory-1
+    type: Opaque
+    stringData:
+      username: *artifactoryUser
+      type: helm
+      url: https://artifactory.csin.cz/artifactory/
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      labels:
+        argocd.argoproj.io/secret-type: repo-creds
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/part-of: argocd
+      name: token-helm-artifactory-2
+    type: Opaque
+    stringData:
+      username: *artifactoryUser
+      type: helm
+      url: https://artifactory.csin.cz:443/artifactory/
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: argocd-styles-cm
+      labels:
+        app.kubernetes.io/instance: *argoCDInstance
+        app.kubernetes.io/part-of: argocd
+    data:
+      custom.styles.css: |
+        .sidebar {
+          background: linear-gradient(to bottom, {{ .Values.cluster.uiColor }}, #30303d, #30303d, #30303d);
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__logo {
+          text-indent: -9999px;
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__logo:after {
+          text-indent: 0;
+          content: "Cluster: {{ .Values.cluster.clusterName }}";
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__logo img {
+          width: 0px;
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__version:before {
+          display: block;
+          content: "Argo CD {{ .Values.instance.argocdInstance | substr 7 -1 | upper }}";
+        }
+
+        .sidebar--collapsed .sidebar__version:before {
+          display: block;
+          content: "{{ .Values.cluster.clusterName }}";
+        }
+
+        .ui-banner {
+          background-color: {{ .Values.cluster.uiColor }};
+        }
+
+        .login__text {
+          visibility: hidden;
+          white-space: pre;
+        }
+
+        .login__text:after {
+          background: linear-gradient(to left, rgba({{ .Values.cluster.uiColorRGBA }},0), rgba({{ .Values.cluster.uiColorRGBA }},0.5), rgba({{ .Values.cluster.uiColorRGBA }},0.5), rgba({{ .Values.cluster.uiColorRGBA }},0.5), rgba({{ .Values.cluster.uiColorRGBA }},0));
+          display: block;
+          visibility: visible;
+          content: "Cluster: {{ .Values.cluster.clusterName }} - ArgoCD: {{ .Values.instance.argocdInstance | substr 7 -1 | upper }}";
+          height: 100px;
+          padding: 20px 0 0 0;
+        }
+  - apiVersion: k8s.ovn.org/v1
+    kind: EgressIP
+    metadata:
+      name: csas-{{ .Values.instance.argocdInstance }}
+    spec:
+      egressIPs:
+      - *egressIP
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: csas-{{ .Values.instance.argocdInstance }}
+      podSelector: {}
+  - kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: allow-same-namespace
+    spec:
+      podSelector: {}
+      ingress:
+        - from:
+            - podSelector: {}
+      policyTypes:
+        - Ingress
+  - kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: allow-from-openshift-user-workload-monitoring
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/part-of: argocd
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  app.kubernetes.io/component: prometheus
+              namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: openshift-user-workload-monitoring
+          ports:
+            - port: metrics
+              protocol: TCP
+      policyTypes:
+        - Ingress
+  - kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: allow-from-openshift-ingress
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-server
+          app.kubernetes.io/instance: argocd-deployment-app
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: ingress
+          ports:
+            - port: argocd-server
+              protocol: TCP
+      policyTypes:
+        - Ingress

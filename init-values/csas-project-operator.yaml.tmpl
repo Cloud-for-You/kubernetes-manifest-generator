@@ -1,6 +1,5 @@
 memory: &memory 128Mi
-argons: &argons ARGOCD_NAMESPACE=csas-argocd-app
-prioclass: &prioclass argocd-deployment
+environmentTypes: &environmentTypes OPERATOR_ENVIRONMENT_TYPES=dev,int,prs,edu,test    # PER-CLUSTER: environment types
 
 ##########
 csas-project-operator:
@@ -14,27 +13,73 @@ csas-project-operator:
           spec:
             containers:
             - name: manager
-              .FINAL_RESOURCES:
+              resources:
                 limits:
                   memory: *memory
                 requests:
                   memory: *memory
-            priorityClassName: *prioclass
-            nodeSelector: *nodeSelector
+            priorityClassName: openshift-user-critical
+            affinity:
+              nodeAffinity: *nodeAffinity
             tolerations: *tolerations
     - apiVersion: ops.csas.cz/v1
       kind: ProjectOperatorConfig
       metadata:
         name: csas-project-operator-controller-manager
       spec:
-        <<: *workload
-        <<: *roleBinding
-        <<: *argoRoleBinding
-        <<: *argoRolePolicies
-
+        applicationSource: https://github.com/csas-ops/{}-ocp4s-apps.git
+        sourceRepos:
+          - git@github.com:csas-ops/{}-*.git
+          - https://github.com/csas-ops/{}-*.git
+          - https://artifactory.csin.cz/artifactory/**
+          - https://artifactory.csin.cz:443/artifactory/**
+        groups:
+          - name: OCP_{S}_DEV
+            environmentRoleBinding:     # PER-CLUSTER: environment types and permissions
+              dev: edit
+              int: view
+              prs: view
+              edu: view
+              test: view
+          - name: OCP_{S}_USR
+            environmentRoleBinding:     # PER-CLUSTER: environment types and permissions
+              dev: view
+              int: view
+              prs: view
+              edu: view
+              test: view
+          - name: OCP_{S}_OPS
+            environmentRoleBinding:     # PER-CLUSTER: environment types and permissions
+              dev: edit
+              int: edit
+              prs: edit
+              edu: edit
+              test: edit
+        argoRoleBindings:
+          controller:
+            - edit
+          server:
+            - view
+            - argocd-app-server-extra
+        appProjectRolePolicies:
+          - role: view
+            actions:
+              - get
+          - role: edit
+            actions:
+              - get
+              - sync
+              - delete
+              - action/*
+        orphanedResources:
+          warn: true
+          ignore: []
+        blacklistedNamespaceResources:
+          - group: storage.csas.cz
+            kind: Nfs
   configMapGenerators:
     - name: controller-manager
       behavior: merge
       literals:
-        - *argons
-        - *envtypes
+        - ARGOCD_NAMESPACE=csas-argocd-app
+        - *environmentTypes

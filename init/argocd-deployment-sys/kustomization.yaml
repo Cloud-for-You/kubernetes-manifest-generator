@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- resources/appproject-default.yaml
+- resources/argocd-resource.yaml
+- resources/argocd-server-styles.yaml
+- resources/rbac.yaml
+- resources/egressip.yaml
+- resources/pdb.yaml
+- resources/redis-ha-pdb.yaml
+- resources/sm.yaml
+- resources/subscription.yaml
+- resources/tokens.yaml

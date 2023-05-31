@@ -1,19 +1,116 @@
+argocd_host: &argocd_host argocd-sys.apps.tocp4s.csin.cz                                # PER-CLUSTER: ArgoCD host
+argocd_styles_url: &argocd_styles_url https://argocd-sys-styles.apps.tocp4s.csin.cz     # PER-CLUSTER: ArgoCD styles URL
+argocd_styles_host: &argocd_styles_host argocd-sys-styles.apps.tocp4s.csin.cz           # PER-CLUSTER: ArgoCD styles host
+egress_ip: &egress_ip "10.88.63.254"                                                    # PER-CLUSTER: ArgoCD SYS Egress IP
+# also replace in configMap argocd-server-styles at the end of this patch file
+
+##########
 argocd-deployment-sys:
-  baseDomain: *baseDomain
-  clusterName: *clusterName
-  cluster:
-    system_repo: *system-repo
-    app_repo: *app-repo
-  git: *git
-  helm: *helm
-  proxy: *proxy
-  certs:
-  - host: artifactory.csin.cz
-    cert: *rootcacert
-  storage: *argocd-storage
-  grafana_dashboards:
-    create: false
-    namespace: csas-monitoring 
-  readonly: false
-  nodeSelector: *nodeSelector
-  tolerations: *tolerations
+  patches:
+  - apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      name: default
+    spec:
+      sourceRepos:
+        - *system-repo
+        - *app-repo
+  - apiVersion: argoproj.io/v1alpha1
+    kind: ArgoCD
+    metadata:
+      name: argocd
+    spec:
+      server:
+        host: *argocd_host
+      dex:
+        groups:
+          - OPENSHIFT4_CLUSTER_ADMINS
+          - DEVTOOLS_ADM
+          - system:cluster-admins
+      extraConfig:
+        ui.cssurl: *argocd_styles_url
+      disableAdmin: null
+      rbac:
+        policy: |
+          g, role:ocp-argocd-sys-admin, role:readonly
+          p, role:ocp-argocd-sys-admin, applications, sync, */*, allow
+          g, OPENSHIFT4_CLUSTER_ADMINS, role:ocp-argocd-sys-admin
+      nodePlacement:
+        nodeSelector: *nodeSelector
+        tolerations: *tolerations
+  - kind: Route
+    apiVersion: route.openshift.io/v1
+    metadata:
+      name: argocd-server-styles
+    spec:
+      host: *argocd_styles_host
+  - apiVersion: k8s.ovn.org/v1
+    kind: EgressIP
+    metadata:
+      name: csas-argocd-sys
+    spec:
+      egressIPs:
+       - *egress_ip
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: argocd-server-styles
+    spec:
+      template:
+        spec:
+          tolerations: *tolerations
+          affinity:
+            nodeAffinity: *nodeAffinity
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: argocd-server-styles
+    data:
+      # Replace tocp4s with cluster name
+      # Replace #248037 with     : LAB: #ff647e,     TEST: #248037,   PRED: #c08c00,   PROD: #982c2c
+      # Replace 36,128,55 with   : LAB: 255,100,126; TEST: 36,128,55; PRED: 192,128,0; PROD:152,44,44
+      page.txt: |
+        HTTP/1.0 200 Found
+        Cache-Control: no-cache
+        Connection: close
+        Content-Type: text/css
+
+        .sidebar {
+          background: linear-gradient(to bottom, #248037, #30303d, #30303d, #30303d); /* PER-CLUSTER: first color */
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__logo {
+          text-indent: -9999px;
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__logo:after {
+          text-indent: 0;
+          content: "Cluster: tocp4s"; /* PER-CLUSTER: cluster name */
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__logo img {
+          width: 0px;
+        }
+
+        .sidebar:not(.sidebar--collapsed) .sidebar__version:before {
+          display: block;
+          content: "Argo CD SYS";
+        }
+
+        .ui-banner {
+          background-color: #248037; /* PER-CLUSTER: color */
+        }
+
+        .login__text {
+          visibility: hidden;
+          white-space: pre;
+        }
+
+        .login__text:after {
+          background: linear-gradient(to left, rgba(36,128,55,0), rgba(36,128,55,0.5), rgba(36,128,55,0.5), rgba(36,128,55,0.5), rgba(36,128,55,0)); /* PER-CLUSTER: all colors */
+          display: block;
+          visibility: visible;
+          content: "Cluster: tocp4s - ArgoCD: SYS"; /* PER-CLUSTER: cluster name */
+          height: 100px;
+          padding: 20px 0 0 0;
+        }

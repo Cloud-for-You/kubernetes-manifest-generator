@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+    app.kubernetes.io/instance: argocd-deployment-sys
+  name: token-git-bitbucket-ocp4
+type: Opaque
+stringData:
+  type: git
+  url: ssh://git@sdf.csin.cz:2222/OCP4
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+    app.kubernetes.io/instance: argocd-deployment-sys
+  name: token-helm-artifactory-1
+type: Opaque
+stringData:
+  username: sysopenshift-read
+  type: helm
+  url: https://artifactory.csin.cz/artifactory/
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+    app.kubernetes.io/instance: argocd-deployment-sys
+  name: token-helm-artifactory-2
+type: Opaque
+stringData:
+  username: sysopenshift-read
+  type: helm
+  url: https://artifactory.csin.cz:443/artifactory/

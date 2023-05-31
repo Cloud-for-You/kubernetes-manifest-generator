@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -eu
+
+yq d -i tmp/render/argo-cd/templates/argocd-server/role.yaml 'rules.(apiGroups[*]==argoproj.io).verbs.(.==create)'
+yq d -i tmp/render/argo-cd/templates/argocd-server/role.yaml 'rules.(apiGroups[*]==argoproj.io).verbs.(.==delete)'
+yq d -i tmp/render/argo-cd/templates/argocd-server/role.yaml 'rules.(apiGroups[*]==argoproj.io).resources.(.==applicationsets)'
+sed -i '1 { s/^/---\n/; }' tmp/render/argo-cd/templates/argocd-server/role.yaml
+
+mkdir -p tmp/render/argo-cd/templates/extra-manifests
+for i in $(seq 0 $(( $(yq r tmp/render/argo-cd/templates/extra-manifests.yaml -d'*' | grep '# Source' | wc -l) - 1 )) ); do
+    kind=$(yq r tmp/render/argo-cd/templates/extra-manifests.yaml -d $i 'kind'); kind=${kind,,}
+    group=$(yq r tmp/render/argo-cd/templates/extra-manifests.yaml -d $i 'apiVersion'); group=${group%/*}
+    name=$(yq r tmp/render/argo-cd/templates/extra-manifests.yaml -d $i 'metadata.name');
+
+    [[ "X${kind}" == "X" ]] && continue
+
+    yq r tmp/render/argo-cd/templates/extra-manifests.yaml -d $i > "tmp/render/argo-cd/templates/extra-manifests/${group}_${kind}_${name}.yaml"
+done
+rm -f tmp/render/argo-cd/templates/extra-manifests.yaml
+
+if [[ "X$(yq r tmp/render/argo-cd/templates/extra-manifests/k8s.ovn.org_egressip_csas-argocd-app.yaml 'spec.egressIPs[0]')" == "Xnull" ]]; then
+    rm -f tmp/render/argo-cd/templates/extra-manifests/k8s.ovn.org_egressip_csas-argocd-app.yaml
+fi
+
+# For redis-ha subchart, because of https://github.com/helm/helm/issues/9027
+# Test manifests are not mutated because helm postrenderer doesn't support hook manifests (see https://github.com/helm/helm/pull/7948). It does not matter because of ArgoCD completly ignores test hook manifests.
+if [[ -f tmp/render/argo-cd/charts/redis-ha/templates/redis-ha-statefulset.yaml ]]; then
+    sed -i '/ runAsUser: /d' tmp/render/argo-cd/charts/redis-ha/templates/redis-ha-statefulset.yaml
+    sed -i '/ fsGroup: /d' tmp/render/argo-cd/charts/redis-ha/templates/redis-ha-statefulset.yaml
+fi
+if [[ -f tmp/render/argo-cd/charts/redis-ha/templates/redis-haproxy-deployment.yaml ]]; then
+    sed -i '/ runAsUser: /d' tmp/render/argo-cd/charts/redis-ha/templates/redis-haproxy-deployment.yaml
+    sed -i '/ fsGroup: /d' tmp/render/argo-cd/charts/redis-ha/templates/redis-haproxy-deployment.yaml
+fi
