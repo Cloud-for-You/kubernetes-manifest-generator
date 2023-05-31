@@ -33,7 +33,58 @@ argocd-deployment-app:
     artifactoryUser: &artifactoryUser "sysopenshift-read"
     uiColor: &uiColor "#248037"                 # PER-CLUSTER: LAB: #ff647e       TEST: #248037     PRED: #c08c00     PROD: #982c2c
     uiColorRGBA: &uiColorRGBA "36,128,55"       # PER-CLUSTER: LAB: 255,100,126   TEST: 36,128,55   PRED: 192,128,0   PROD:152,44,44
-    egressIP: &egressIP 10.88.63.253            # PER-CLUSTER: egress ip (optional, for lab may be empty)
+    egressIP: &egressIP 10.255.255.255          # PER-CLUSTER: egress ip (optional, for lab may be empty)
+    resources:
+      notifications: &resources_notifications
+        requests:
+          cpu: 250m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      dex: &resources_dex
+        requests:
+          cpu: 250m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      redis: &resources_redis
+        requests:
+          cpu: 250m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      redis_haproxy: &resources_redis_haproxy
+        requests:
+          cpu: 250m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      reposerver: &resources_reposerver
+        requests:
+          cpu: 500m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1024Mi
+      server: &resources_server
+        requests:
+          cpu: 125m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      controller: &resources_controller
+        requests:
+          cpu: 1000m
+          memory: 1024Mi
+        limits:
+          cpu: 2000m
+          memory: 2048Mi
+
   ################################################################################
   instance:
     argocdInstance: &argoCDInstance argocd-app
@@ -258,13 +309,7 @@ argocd-deployment-app:
     subscriptions: []
     templates: {}
     triggers: {}
-    resources:
-      requests:
-        cpu: 250m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
+    resources: *resources_notifications
   dex:
     extraArgs:
     - --logformat
@@ -281,13 +326,7 @@ argocd-deployment-app:
     serviceAccount:
       annotations:
         serviceaccounts.openshift.io/oauth-redirectreference.argocd: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"argocd-server"}}'
-    resources:
-      requests:
-        cpu: 250m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
+    resources: *resources_dex
   redis-ha:
     enabled: true
     labels:
@@ -297,6 +336,7 @@ argocd-deployment-app:
       fsGroup: null
       supplementalGroups:
       - 1000
+    resources: *resources_redis
     containerSecurityContext:
       runAsUser: null
     haproxy:
@@ -309,6 +349,7 @@ argocd-deployment-app:
         maxUnavailable: 1
       additionalAffinities:
         nodeAffinity: *nodeAffinity
+      resources: *resources_redis_haproxy
     podDisruptionBudget:
       maxUnavailable: 1
     additionalAffinities:
@@ -324,13 +365,7 @@ argocd-deployment-app:
       imagePullPolicy: null
     securityContext:
       runAsUser: 
-    resources:
-      requests:
-        cpu: 250m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
+    resources: *resources_redis
   repoServer:
     clusterAdminAccess:
       enabled: *clusterAdminAccess
@@ -343,13 +378,7 @@ argocd-deployment-app:
           regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
           replacement: kube_$1
     priorityClassName: openshift-user-critical
-    resources:
-      requests:
-        cpu: 500m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 1024Mi
+    resources: *resources_reposerver
     envFrom:
     - configMapRef:
         name: proxy
@@ -369,13 +398,7 @@ argocd-deployment-app:
             regex: __meta_kubernetes_service_label_app_kubernetes_io_(.+)
             replacement: kube_$1
     priorityClassName: openshift-user-critical
-    resources:
-      requests:
-        cpu: 125m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
+    resources: *resources_server
     envFrom:
     - configMapRef:
         name: proxy
@@ -400,13 +423,7 @@ argocd-deployment-app:
         labels:
         - ops.csas.cz/top-level-application
     priorityClassName: openshift-user-critical
-    resources:
-      requests:
-        cpu: 1000m
-        memory: 1024Mi
-      limits:
-        cpu: 2000m
-        memory: 2048Mi
+    resources: *resources_controller
   extraObjects:
   - apiVersion: v1
     data:

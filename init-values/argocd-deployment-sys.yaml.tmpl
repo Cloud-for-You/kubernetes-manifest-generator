@@ -36,7 +36,7 @@ argocd-deployment-sys:
           p, role:ocp-argocd-sys-admin, applications, sync, */*, allow
           g, OPENSHIFT4_CLUSTER_ADMINS, role:ocp-argocd-sys-admin
       nodePlacement:
-        nodeSelector: *nodeSelector
+        # nodeSelector: *nodeSelector         # disabled because of HA redis (replica pending when less than 3 infra nodes + available disruptions gone = case of DR)
         tolerations: *tolerations
   - kind: Route
     apiVersion: route.openshift.io/v1

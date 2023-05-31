@@ -1,4 +1,5 @@
 memory: &memory 128Mi
+cpu: &cpu 100m
 environmentTypes: &environmentTypes OPERATOR_ENVIRONMENT_TYPES=dev,int,prs,edu,test    # PER-CLUSTER: environment types
 
 ##########
@@ -16,8 +17,10 @@ csas-project-operator:
               resources:
                 limits:
                   memory: *memory
+                  cpu: *cpu
                 requests:
                   memory: *memory
+                  cpu: *cpu
             priorityClassName: openshift-user-critical
             affinity:
               nodeAffinity: *nodeAffinity
