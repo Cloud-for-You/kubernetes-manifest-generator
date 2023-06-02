@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
 
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
