@@ -336,10 +336,17 @@ argocd-deployment-app:
       fsGroup: null
       supplementalGroups:
       - 1000
-    resources: *resources_redis
-    priorityClassName: openshift-user-critical
     containerSecurityContext:
       runAsUser: null
+    podDisruptionBudget:
+      maxUnavailable: 1
+    additionalAffinities:
+      nodeAffinity: *nodeAffinity
+    tolerations: *tolerations
+    priorityClassName: openshift-user-critical
+    redis:
+      resources: *resources_redis
+      priorityClassName: openshift-user-critical
     haproxy:
       securityContext:
         runAsUser: null
@@ -352,11 +359,6 @@ argocd-deployment-app:
         nodeAffinity: *nodeAffinity
       resources: *resources_redis_haproxy
       priorityClassName: openshift-user-critical
-    podDisruptionBudget:
-      maxUnavailable: 1
-    additionalAffinities:
-      nodeAffinity: *nodeAffinity
-    tolerations: *tolerations
   redis:
     enabled: false
     priorityClassName: openshift-user-critical
