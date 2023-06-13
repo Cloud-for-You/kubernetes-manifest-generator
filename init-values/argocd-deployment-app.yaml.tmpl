@@ -337,6 +337,7 @@ argocd-deployment-app:
       supplementalGroups:
       - 1000
     resources: *resources_redis
+    priorityClassName: openshift-user-critical
     containerSecurityContext:
       runAsUser: null
     haproxy:
@@ -350,6 +351,7 @@ argocd-deployment-app:
       additionalAffinities:
         nodeAffinity: *nodeAffinity
       resources: *resources_redis_haproxy
+      priorityClassName: openshift-user-critical
     podDisruptionBudget:
       maxUnavailable: 1
     additionalAffinities:
