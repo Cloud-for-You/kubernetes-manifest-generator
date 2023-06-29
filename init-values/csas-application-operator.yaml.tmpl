@@ -1,5 +1,6 @@
-memory: &memory 128Mi
-cpu: &cpu 100m
+memory: &memory 1536Mi                                                           # PER-CLUSTER: memory request/limit
+cpu: &cpu 250m                                                                   # PER-CLUSTER: cpu request
+maxConcurrentReconciles: &maxConcurrentReconciles MAX_CONCURRENT_RECONCILES=8    # PER-CLUSTER: max concurrent reconciles
 
 ##########
 csas-application-operator:
@@ -16,7 +17,7 @@ csas-application-operator:
               resources:
                 limits:
                   memory: *memory
-                  cpu: *cpu
+                  cpu: '2'
                 requests:
                   memory: *memory
                   cpu: *cpu
@@ -29,3 +30,4 @@ csas-application-operator:
       behavior: merge
       literals:
         - ARGOCD_NAMESPACE=csas-argocd-app
+        - *maxConcurrentReconciles

@@ -1,6 +1,7 @@
-memory: &memory 128Mi
-cpu: &cpu 100m
+memory: &memory 1536Mi                                                                 # PER-CLUSTER: memory request/limit
+cpu: &cpu 250m                                                                         # PER-CLUSTER: cpu request
 environmentTypes: &environmentTypes OPERATOR_ENVIRONMENT_TYPES=dev,int,prs,edu,test    # PER-CLUSTER: environment types
+maxConcurrentReconciles: &maxConcurrentReconciles MAX_CONCURRENT_RECONCILES=4          # PER-CLUSTER: max concurrent reconciles
 
 ##########
 csas-project-operator:
@@ -17,7 +18,7 @@ csas-project-operator:
               resources:
                 limits:
                   memory: *memory
-                  cpu: *cpu
+                  cpu: '2'
                 requests:
                   memory: *memory
                   cpu: *cpu
@@ -30,7 +31,8 @@ csas-project-operator:
       metadata:
         name: csas-project-operator-controller-manager
       spec:
-        applicationSource: https://github.com/csas-ops/{}-ocp4s-apps.git
+        applicationSource: https://github.com/csas-ops/{}-apps.git
+        applicationSourcePath: ocp4s
         sourceRepos:
           - git@github.com:csas-ops/{}-*.git
           - https://github.com/csas-ops/{}-*.git
@@ -85,4 +87,5 @@ csas-project-operator:
       behavior: merge
       literals:
         - ARGOCD_NAMESPACE=csas-argocd-app
+        - *maxConcurrentReconciles
         - *environmentTypes

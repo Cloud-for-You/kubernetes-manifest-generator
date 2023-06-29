@@ -34,56 +34,64 @@ argocd-deployment-app:
     uiColor: &uiColor "#248037"                 # PER-CLUSTER: LAB: #ff647e       TEST: #248037     PRED: #c08c00     PROD: #982c2c
     uiColorRGBA: &uiColorRGBA "36,128,55"       # PER-CLUSTER: LAB: 255,100,126   TEST: 36,128,55   PRED: 192,128,0   PROD:152,44,44
     egressIP: &egressIP 10.255.255.255          # PER-CLUSTER: egress ip (optional, for lab may be empty)
-    resources:
+    resources:                                  # PER-CLUSTER: resources
       notifications: &resources_notifications
         requests:
-          cpu: 250m
-          memory: 128Mi
+          cpu: 125m
+          memory: 1Gi
         limits:
-          cpu: 500m
-          memory: 256Mi
+          cpu: '2'
+          memory: 1Gi
       dex: &resources_dex
         requests:
-          cpu: 250m
-          memory: 128Mi
+          cpu: 125m
+          memory: 256Mi
         limits:
-          cpu: 500m
+          cpu: '2'
           memory: 256Mi
       redis: &resources_redis
         requests:
-          cpu: 250m
-          memory: 128Mi
+          cpu: 125m
+          memory: 1Gi
         limits:
-          cpu: 500m
-          memory: 256Mi
+          cpu: '2'
+          memory: 1Gi
       redis_haproxy: &resources_redis_haproxy
-        requests:
-          cpu: 250m
-          memory: 128Mi
-        limits:
-          cpu: 500m
-          memory: 256Mi
-      reposerver: &resources_reposerver
-        requests:
-          cpu: 500m
-          memory: 512Mi
-        limits:
-          cpu: 1000m
-          memory: 1024Mi
-      server: &resources_server
         requests:
           cpu: 125m
           memory: 128Mi
         limits:
-          cpu: 500m
-          memory: 256Mi
+          cpu: '2'
+          memory: 128Mi
+      reposerver: &resources_reposerver
+        requests:
+          cpu: 250m
+          memory: 1Gi
+        limits:
+          cpu: '2'
+          memory: 1Gi
+      server: &resources_server
+        requests:
+          cpu: 250m
+          memory: 4Gi
+        limits:
+          cpu: '2'
+          memory: 4Gi
       controller: &resources_controller
         requests:
-          cpu: 1000m
-          memory: 1024Mi
+          cpu: '4'
+          memory: 24Gi
         limits:
-          cpu: 2000m
-          memory: 2048Mi
+          cpu: '8'
+          memory: 24Gi
+    replicas:
+      server: &replicas_server 8                      # PER-CLUSTER: number of replicas
+      repo-server: &replicas_repo_server 2            # PER-CLUSTER: number of replicas
+    config:
+      timeout.reconciliation: &config_timeout_reconciliation '600s'                      # PER-CLUSTER: value
+      controller.operation.processors: &config_controller_operation_processors '50'      # PER-CLUSTER: value
+      controller.status.processors: &config_controller_status_processors '100'           # PER-CLUSTER: value
+      ARGOCD_GRPC_MAX_SIZE_MB: &grpcMaxSize '500'                                        # PER-CLUSTER: value
 
   ################################################################################
   instance:
@@ -283,8 +291,11 @@ argocd-deployment-app:
       ui.bannerpermanent: "true"
       ui.bannerposition: "top"
       ui.cssurl: "./custom/custom.styles.css"       # Helm chart Values.configs.styles not used beacuse it can't be templated; see argocd-styles-cm extra resource
+      timeout.reconciliation: *config_timeout_reconciliation
     params:
       server.insecure: "true"
+      controller.operation.processors: *config_controller_operation_processors
+      controller.status.processors: *config_controller_status_processors
     rbac:
       policy.default: role:none
       policy.csv: *rbacPolicy
@@ -336,17 +347,9 @@ argocd-deployment-app:
       fsGroup: null
       supplementalGroups:
       - 1000
+    resources: *resources_redis
     containerSecurityContext:
       runAsUser: null
-    podDisruptionBudget:
-      maxUnavailable: 1
-    additionalAffinities:
-      nodeAffinity: *nodeAffinity
-    tolerations: *tolerations
-    priorityClassName: openshift-user-critical
-    redis:
-      resources: *resources_redis
-      priorityClassName: openshift-user-critical
     haproxy:
       securityContext:
         runAsUser: null
@@ -358,7 +361,11 @@ argocd-deployment-app:
       additionalAffinities:
         nodeAffinity: *nodeAffinity
       resources: *resources_redis_haproxy
-      priorityClassName: openshift-user-critical
+    podDisruptionBudget:
+      maxUnavailable: 1
+    additionalAffinities:
+      nodeAffinity: *nodeAffinity
+    tolerations: *tolerations
   redis:
     enabled: false
     priorityClassName: openshift-user-critical
@@ -386,7 +393,7 @@ argocd-deployment-app:
     envFrom:
     - configMapRef:
         name: proxy
-    replicas: 2
+    replicas: *replicas_repo_server
     pdb:
       enabled: true
       maxUnavailable: 1
@@ -406,10 +413,13 @@ argocd-deployment-app:
     envFrom:
     - configMapRef:
         name: proxy
-    replicas: 2
+    replicas: *replicas_server
     pdb:
       enabled: true
       maxUnavailable: 1
+    env:
+     - name: ARGOCD_GRPC_MAX_SIZE_MB
+       value: *grpcMaxSize
   controller:
     clusterAdminAccess:
       enabled: *clusterAdminAccess
