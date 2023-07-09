@@ -1,26 +1,25 @@
 renderBootstrap() {
-
   local global_value_file="${ROOTDIR}/values/global.yaml"
-  local git_repo=$(yq read -X ${global_value_file} 'system_repo')
+  local git_repo=$(yq '.system_repo |explode(.)' ${global_value_file})
   local argo_namespace=csas-argocd-sys
 
-  local CLUSTER_NAME=$(yq read ${ROOTDIR}/values/global.yaml clusterName | tr '[:lower:]' '[:upper:]')
+  local CLUSTER_NAME=$(yq '.clusterName' ${ROOTDIR}/values/global.yaml | tr '[:lower:]' '[:upper:]')
 
   local name=bootstrap
   cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
   getBootstrap "${name}" "" "${argo_namespace}"
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.syncPolicy.syncOptions[0]' "CreateNamespace=false"
+  yq '.spec.syncPolicy.syncOptions[0] = "CreateNamespace=false"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
 
-  local workload_repo=$(yq read -X ${global_value_file} 'app_repo')
+  local workload_repo=$(yq '.app_repo |explode(.)' ${global_value_file})
   cp ${ROOTDIR}/script/init-values/bootstrap.projects ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.repoURL' ${workload_repo}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.project' onboarding
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.path' _PROJECTS_
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml 'spec.source.targetRevision' master
+  yq '.spec.source.repoURL = "'"${workload_repo}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
+  yq '.spec.project = "onboarding"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
+  yq '.spec.source.path = "_PROJECTS_"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
+  yq '.spec.source.targetRevision = "master"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects.yaml
 
   cp ${ROOTDIR}/script/init-values/bootstrap.projects-manifests ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.repoURL' ${workload_repo}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.project' onboarding
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.path' ${CLUSTER_NAME:-.}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml 'spec.source.targetRevision' master
+  yq '.spec.source.repoURL = "'"${workload_repo}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
+  yq '.spec.project = "onboarding"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
+  yq '.spec.source.path = "'"${CLUSTER_NAME:-.}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
+  yq '.spec.source.targetRevision = "master"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/projects-manifests.yaml
 }

@@ -15,7 +15,7 @@ render_helm() {
 
   mkdir -p tmp
 
-  cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
+  cat values/global.yaml values/${name}.yaml | yq '. |explode(.)' - |yq '.'"${name}" - > tmp/${name}.yaml
 
   local values_file="tmp/${name}.yaml"
 
@@ -23,7 +23,7 @@ render_helm() {
   echo "Value files: ${values_file}"
 
   # Check search helmchart
-  if [ "$(helm search repo ${repository}/${helmchart} --version ${version} -o yaml | yq read - --length)" -eq 0 ]; then
+  if [ "$(helm search repo ${repository}/${helmchart} --version ${version} -o yaml | yq '. |length' -)" -eq 0 ]; then
     echo "${RED}v repository neni Helmchart ${helmchart} ve verzi ${version} k dispozici${NC}"
     return 1;
   fi

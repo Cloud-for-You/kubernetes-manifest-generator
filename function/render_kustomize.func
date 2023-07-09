@@ -7,16 +7,16 @@ render_kustomize() {
 
   mkdir -p tmp/render/${name}/templates
 
-  cat values/global.yaml values/${name}.yaml | yq read -X - | yq read - ${name} > tmp/${name}.yaml
+  cat values/global.yaml values/${name}.yaml | yq '. |explode(.)' - |yq '.'"${name}" - > tmp/${name}.yaml
   local values_file="tmp/${name}.yaml"
 
   echo "${GREEN}Render kustomize component: ${name} ${version}${NC}"
   echo "Value files: ${values_file}"
 
-  local num=$(yq read "${values_file}" --length patches); num=${num:=0}
+  local num=$(yq '.patches |length' "${values_file}"); num=${num:=0}
   local i
   for (( i=0; i < "${num}"; ++i )); do
-    yq read -X "${values_file}" patches.[${i}]
+    yq '.patches.'"[${i}]" "${values_file}"
     echo "---"
   done > tmp/render/${name}/patches.yaml
 
@@ -27,7 +27,7 @@ namespace: ${namespace}
 resources:
 - https://artifactory.csin.cz/artifactory/${repository}/${name}/${artefact}-${version}.zip
 configMapGenerator:
-$(yq read -X "${values_file}" configMapGenerators)
+$(yq '.configMapGenerators |explode(.) // "  null"' "${values_file}")
 EOF
 
 if [ "${num}" -gt 0 ]; then

@@ -1,18 +1,19 @@
 getComponents() {
-  for component in $(yq read values/components.yaml --printMode p "*"); do
-    local num=$(yq read values/components.yaml --length "${component}")
+  for component in $(yq '... comments="" |keys' values/components.yaml); do
+    local num=$(yq '.'"${component}"' |length' values/components.yaml)
 
     for ((i = 0; i < "${num}"; ++i )); do
-      local type=$(yq read values/components.yaml --defaultValue helm "${component}[${i}].type")
+      local type=$(yq '.'"${component}[${i}]"'.type // "helm"' values/components.yaml)
 
-      local name=$(yq read values/components.yaml "${component}[${i}].name")
-      local version=$(yq read values/components.yaml "${component}[${i}].version")
-      local appproject=$(yq read values/components.yaml "${component}[${i}].appproject")
-      local appconfig=$(yq read values/components.yaml "${component}[${i}].appconfig")
-      local namespace=$(yq read values/components.yaml "${component}[${i}].namespace")
-      local repository=$(yq read values/components.yaml "${component}[${i}].repository")
-      local artefact=$(yq read values/components.yaml "${component}[${i}].artefact")
+      local name=$(yq '.'"${component}[${i}]"'.name // ""' values/components.yaml)
+      local version=$(yq '.'"${component}[${i}]"'.version // ""' values/components.yaml)
+      local appproject=$(yq '.'"${component}[${i}]"'.appproject // ""' values/components.yaml)
+      local appconfig=$(yq '.'"${component}[${i}]"'.appconfig // ""' values/components.yaml)
+      local namespace=$(yq '.'"${component}[${i}]"'.namespace // ""' values/components.yaml)
+      local repository=$(yq '.'"${component}[${i}]"'.repository // ""' values/components.yaml)
+      local artefact=$(yq '.'"${component}[${i}]"'.artefact // ""' values/components.yaml)
 
+      echo "render_${type} ${name} ${version} ${namespace} ${repository} ${artefact}"
       render_${type} "${name}" "${version}" "${namespace}" "${repository}" "${artefact}"
       getBootstrap "${name}" "${appconfig}" "${namespace}" "${appproject}"
     done

@@ -6,20 +6,21 @@ getBootstrap() {
   local appproject="${4:-default}"
 
   local global_value_file="${ROOTDIR}/values/global.yaml"
-  local git_repo=$(yq read -X ${global_value_file} 'system_repo')
+  local git_repo=$(yq '.system_repo |explode(.)' "${global_value_file}")
 
   local argo_namespace=csas-argocd-sys
 
   cp ${ROOTDIR}/script/init-values/bootstrap.default ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'metadata.name' ${name}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'metadata.namespace' ${argo_namespace}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.source.repoURL' ${git_repo}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.source.path' .FINAL_RESOURCES/${name}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.destination.namespace' ${namespace}
-  yq write -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml 'spec.project' ${appproject}
+  yq '.metadata.name = "'"${name}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+  yq '.metadata.namespace = "'"${argo_namespace}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+  yq '.spec.source.repoURL = "'"${git_repo}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+  yq '.spec.source.path = ".FINAL_RESOURCES/'"${name}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+  yq '.spec.destination.namespace = "'"${namespace}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+  yq '.spec.project = "'"${appproject}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
 
+  echo "$appconfig" |yq >tmp/${name}.tmp.yaml
   if [ ! -z "${appconfig}" ]; then
-    echo "${appconfig}" | yq merge -i --overwrite ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml -
+    yq '. *= load("tmp/'"${name}"'.tmp.yaml")' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
   fi
 
 }
