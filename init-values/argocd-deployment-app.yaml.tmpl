@@ -37,61 +37,61 @@ argocd-deployment-app:
     resources:                                  # PER-CLUSTER: resources
       notifications: &resources_notifications
         requests:
-          cpu: 125m
-          memory: 1Gi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 512Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 1Gi
+          memory: 512Mi                         # PER-CLUSTER: memory request/limit
       dex: &resources_dex
         requests:
-          cpu: 125m
-          memory: 256Mi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 256Mi
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
       redis: &resources_redis
         requests:
-          cpu: 125m
-          memory: 1Gi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 1Gi
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
       redis_haproxy: &resources_redis_haproxy
         requests:
-          cpu: 125m
-          memory: 128Mi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 128Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 128Mi
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
       reposerver: &resources_reposerver
         requests:
-          cpu: 250m
-          memory: 1Gi
+          cpu: 250m                             # PER-CLUSTER: cpu request
+          memory: 512Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 1Gi
+          memory: 512Mi                         # PER-CLUSTER: memory request/limit
       server: &resources_server
         requests:
-          cpu: 250m
-          memory: 4Gi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 2Gi                           # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 4Gi
+          memory: 2Gi                           # PER-CLUSTER: memory request/limit
       controller: &resources_controller
         requests:
-          cpu: '4'
-          memory: 24Gi
+          cpu: '2'                              # PER-CLUSTER: cpu request
+          memory: 12Gi                          # PER-CLUSTER: memory request/limit
         limits:
-          cpu: '8'
-          memory: 24Gi
+          cpu: '4'
+          memory: 12Gi                          # PER-CLUSTER: memory request/limit
     replicas:
-      server: &replicas_server 8                      # PER-CLUSTER: number of replicas
+      server: &replicas_server 4                      # PER-CLUSTER: number of replicas
       repo-server: &replicas_repo_server 2            # PER-CLUSTER: number of replicas
     config:
-      timeout.reconciliation: &config_timeout_reconciliation '600s'                      # PER-CLUSTER: value
-      controller.operation.processors: &config_controller_operation_processors '50'      # PER-CLUSTER: value
-      controller.status.processors: &config_controller_status_processors '100'           # PER-CLUSTER: value
-      ARGOCD_GRPC_MAX_SIZE_MB: &grpcMaxSize '500'                                        # PER-CLUSTER: value
+      timeout.reconciliation: &config_timeout_reconciliation '180s'                      # PER-CLUSTER: value
+      controller.operation.processors: &config_controller_operation_processors '25'      # PER-CLUSTER: value
+      controller.status.processors: &config_controller_status_processors '50'            # PER-CLUSTER: value
+      ARGOCD_GRPC_MAX_SIZE_MB: &grpcMaxSize '200'                                        # PER-CLUSTER: value
 
   ################################################################################
   instance:

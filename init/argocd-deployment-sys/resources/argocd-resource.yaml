@@ -16,7 +16,7 @@ spec:
         memory: 2Gi
 # ---------- Server ---------- #
   server:
-    host: argocd-sys.apps.<CLUSTER>.<DOMAIN> # PER-CLUSTER: cluster address
+    host: argocd-sys.apps.<CLUSTER>.<DOMAIN>
     ingress:
       enabled: false
     logFormat: json
@@ -81,7 +81,7 @@ spec:
   extraConfig:
     ui.bannerpermanent: 'true'
     ui.bannerposition: top
-    ui.cssurl: 'https://argocd-sys-styles.apps.<CLUSTER>.<DOMAIN>' # PER-CLUSTER: cluster address
+    ui.cssurl: 'https://argocd-sys-styles.apps.<CLUSTER>.<DOMAIN>'
 # ---------- Security ---------- #
   disableAdmin: true
   rbac:
