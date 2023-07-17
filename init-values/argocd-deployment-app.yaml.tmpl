@@ -5,6 +5,7 @@ argocd-deployment-app:
     install: false
   ################################################################################
   cluster:
+    adminEnabled: &adminEnabled false
     baseDomain: *baseDomain
     clusterName: *clusterName
     url: &url https://argocd-app.apps.tocp4s.csin.cz # PER-CLUSTER: cluster address
@@ -280,6 +281,7 @@ argocd-deployment-app:
     enabled: true
   configs:
     cm:
+      admin.enabled: *adminEnabled
       url: *url
       application.instanceLabelKey: *labelKey
       server.rbac.log.enforce.enable: "false"
