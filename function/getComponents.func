@@ -13,7 +13,6 @@ getComponents() {
       local repository=$(yq '.'"${component}[${i}]"'.repository // ""' values/components.yaml)
       local artefact=$(yq '.'"${component}[${i}]"'.artefact // ""' values/components.yaml)
 
-      echo "render_${type} ${name} ${version} ${namespace} ${repository} ${artefact}"
       render_${type} "${name}" "${version}" "${namespace}" "${repository}" "${artefact}"
       getBootstrap "${name}" "${appconfig}" "${namespace}" "${appproject}"
     done
