@@ -5,6 +5,7 @@ argocd-deployment-app:
     install: false
   ################################################################################
   cluster:
+    adminEnabled: &adminEnabled false
     baseDomain: *baseDomain
     clusterName: *clusterName
     url: &url https://argocd-app.apps.tocp4s.csin.cz # PER-CLUSTER: cluster address
@@ -34,56 +35,56 @@ argocd-deployment-app:
     uiColor: &uiColor "#248037"                 # PER-CLUSTER: LAB: #ff647e       TEST: #248037     PRED: #c08c00     PROD: #982c2c
     uiColorRGBA: &uiColorRGBA "36,128,55"       # PER-CLUSTER: LAB: 255,100,126   TEST: 36,128,55   PRED: 192,128,0   PROD:152,44,44
     egressIP: &egressIP 10.255.255.255          # PER-CLUSTER: egress ip (optional, for lab may be empty)
-    resources:                                  # PER-CLUSTER: resources
+    resources:
       notifications: &resources_notifications
         requests:
-          cpu: 125m
-          memory: 1Gi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 1Gi                           # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 1Gi
+          memory: 1Gi                           # PER-CLUSTER: memory request/limit
       dex: &resources_dex
         requests:
-          cpu: 125m
-          memory: 256Mi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 256Mi
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
       redis: &resources_redis
         requests:
-          cpu: 125m
-          memory: 1Gi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 1Gi                           # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 1Gi
+          memory: 1Gi                           # PER-CLUSTER: memory request/limit
       redis_haproxy: &resources_redis_haproxy
         requests:
-          cpu: 125m
-          memory: 128Mi
+          cpu: 125m                             # PER-CLUSTER: cpu request
+          memory: 128Mi                         # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 128Mi
+          memory: 256Mi                         # PER-CLUSTER: memory request/limit
       reposerver: &resources_reposerver
         requests:
-          cpu: 250m
-          memory: 1Gi
+          cpu: 250m                             # PER-CLUSTER: cpu request
+          memory: 1Gi                           # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 1Gi
+          memory: 1Gi                           # PER-CLUSTER: memory request/limit
       server: &resources_server
         requests:
-          cpu: 250m
-          memory: 4Gi
+          cpu: 250m                             # PER-CLUSTER: cpu request
+          memory: 4Gi                           # PER-CLUSTER: memory request/limit
         limits:
           cpu: '2'
-          memory: 4Gi
+          memory: 4Gi                           # PER-CLUSTER: memory request/limit
       controller: &resources_controller
         requests:
-          cpu: '4'
-          memory: 24Gi
+          cpu: '4'                              # PER-CLUSTER: cpu request
+          memory: 24Gi                          # PER-CLUSTER: memory request/limit
         limits:
           cpu: '8'
-          memory: 24Gi
+          memory: 24Gi                          # PER-CLUSTER: memory request/limit
     replicas:
       server: &replicas_server 8                      # PER-CLUSTER: number of replicas
       repo-server: &replicas_repo_server 2            # PER-CLUSTER: number of replicas
@@ -280,6 +281,7 @@ argocd-deployment-app:
     enabled: true
   configs:
     cm:
+      admin.enabled: *adminEnabled
       url: *url
       application.instanceLabelKey: *labelKey
       server.rbac.log.enforce.enable: "false"
@@ -347,7 +349,7 @@ argocd-deployment-app:
       fsGroup: null
       supplementalGroups:
       - 1000
-    resources: *resources_redis
+    priorityClassName: openshift-user-critical
     containerSecurityContext:
       runAsUser: null
     haproxy:
@@ -361,11 +363,14 @@ argocd-deployment-app:
       additionalAffinities:
         nodeAffinity: *nodeAffinity
       resources: *resources_redis_haproxy
+      priorityClassName: openshift-user-critical
     podDisruptionBudget:
       maxUnavailable: 1
     additionalAffinities:
       nodeAffinity: *nodeAffinity
     tolerations: *tolerations
+    redis:
+      resources: *resources_redis
   redis:
     enabled: false
     priorityClassName: openshift-user-critical
