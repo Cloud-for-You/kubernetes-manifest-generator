@@ -8,6 +8,12 @@ NC=`tput sgr0`        # No Color
 
 ROOTDIR=$(pwd)
 
+echo """Minimum versions of binaries tested with:
+yq:        4.34.1 (https://artifactory.csin.cz:443/artifactory/github-com-releases-download-cache/mikefarah/yq/releases/download/v4.34.1/yq_linux_amd64.tar.gz)
+helm:      3.11.3 (https://artifactory.csin.cz:443/artifactory/get-helm-sh-cache/helm-v3.11.3-linux-amd64.tar.gz)
+kustomize: 3.8.5  (https://artifactory.csin.cz:443/artifactory/github-com-releases-download-cache/kubernetes-sigs/kustomize/releases/download/kustomize/v3.8.5/kustomize_v3.8.5_linux_amd64.tar.gz)
+"""
+
 helm repo update
 
 for function_file in `find $(dirname $0)/function/ -name *.func`; do
