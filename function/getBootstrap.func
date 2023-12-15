@@ -18,9 +18,9 @@ getBootstrap() {
   yq '.spec.destination.namespace = "'"${namespace}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
   yq '.spec.project = "'"${appproject}"'"' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
 
-  echo "$appconfig" |yq >tmp/${name}.tmp.yaml
-  if [ ! -z "${appconfig}" ]; then
-    yq '. *= load("tmp/'"${name}"'.tmp.yaml")' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
-  fi
+#  echo "$appconfig" | yq >tmp/${name}.tmp.yaml
+#  if [ ! -z "${appconfig}" ]; then
+#    yq '. *= load("tmp/'"${name}"'.tmp.yaml")' -i ${ROOTDIR}/.FINAL_RESOURCES/bootstrap/${name}.yaml
+#  fi
 
 }
